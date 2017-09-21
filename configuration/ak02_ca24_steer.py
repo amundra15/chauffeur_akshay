@@ -172,12 +172,12 @@ class configTrain(configMain):
 
 
 		self.loss_function = 'mse_branched'  # Chose between: mse_branched, mse_branched_ladd
-		self.learning_rate = 0.01 # First
+		self.learning_rate = 0.0002 # First
 		self.training_schedule = [[50000,0.5],[100000,0.5*0.5],[150000,0.5*0.5*0.5],[200000,0.5*0.5*0.5*0.5],[250000,0.5*0.5*0.5*0.5*0.5]]    # Number of iterations, multiplying factor
 		self.lambda_l2 = 1e-3 # Not used
-		self.branch_loss_weight = [0.5]		#wights of each branch. wont matter for single branch case
-		self.variable_weight = {'Steer':0.5,'Speed':0.5}
-		self.output_weigth = [0.5,0.5]
+		self.branch_loss_weight = [1.0]		#wights of each branch. wont matter for single branch case
+		self.variable_weight = {'Steer':0.875,'Speed':0.125}	#speed varies from 0 to 7, while steer from -1 to 1. thus bringing them to same scale
+		#self.output_weigth = [0.5,0.5] 	#no longer used
 		self.network_name = 'controlNetSpeedP'	
 		self.lambda_tolerance = 5
 		self.is_training = True
@@ -215,8 +215,8 @@ class configOutput(configMain):
 		""" Feature Visualization Part """
 		# TODO : self.histograms_list=[]	self.features_to_draw=  self.weights_to_draw=
 
-
-
+		self.branch_config = [["Steer"]]
+		self.targets_names =['Steer']
 
 
 

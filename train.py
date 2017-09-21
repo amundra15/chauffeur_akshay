@@ -9,7 +9,7 @@ from dataset_manager  import *
 from training_manager import TrainManager
 from output_manager import OutputManager
 
-
+import tensorflow as tf
 
 def restore_session(sess,saver,models_path):
 
@@ -123,10 +123,22 @@ def train(gpu_number, experiment_name):
       save_model(saver,sess,config.models_path,i)
 
 
-    #   """ Run the training step and monitor its execution time """
+    '''if i == 1: 
+      
+      network_outputs_split =tf.split(training_manager._output_network[0],training_manager._output_network[0].get_shape()[1],1 )
+      branches_configuration = config.branch_config
+      
+      target_name = branches_configuration[0][0] # name of the target is steer, when running ak02_ca24_steer
+      
+      ground_truths = training_manager._targets_data
+      target_gt = ground_truths[config.targets_names.index(target_name)]
+      print target_gt
+      print tf.Session().run(target_gt)
 
-        
-    #   #print "NEXT STEP GETING"
+      if target_name == 'Steer': 
+        # Save to file
+        print 'saving steer values'
+        np.savetxt('data_stats' +'/' +'batch_steer.npy',tf.Session().run(target_gt))'''
 
     training_manager.run_train_step(batch_tensor,sess,i)
     #   #print "RUNNED STEP"

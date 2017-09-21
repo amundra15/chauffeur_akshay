@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 def branched_speed(image_input,speed,control_input,config,sess,train_manager):
 
@@ -106,6 +107,11 @@ def single_branch(image_input,config,sess,train_manager):
 
 
   output_all = sess.run(all_net, feed_dict=feedDict)
+
+
+  #******you will have to convert one-hot vectors back to a single steering variable*******
+  #index = tf.argmax(one_hot_vector, axis=1)  #something like this
+
 
 
   predicted_steers = (output_all[0][0])

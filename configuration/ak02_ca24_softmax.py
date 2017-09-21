@@ -5,7 +5,7 @@ from imgaug import augmenters as iaa
 import os
 import glob
 
-
+#This code is yet to develop. It is for converting classification problem to regression problem(for steer)
 # 
 # This is a config file, with three parts: Input, Training, Output, which are then joined in Main
 #
@@ -55,6 +55,11 @@ class configMain:
 		# if there is branching, this is used to build the network. Names should be same as targets
 		# currently the ["Steer"]x4 should not be changed
 		self.branch_config = [["Steer"],["Steer"],["Steer"],["Steer"],["Gas"],["Speed"]]'''
+		
+
+
+
+		#*****maybe it should be [["Steer","Steer","Steer","Speed"]]******
 		self.branch_config = [["Steer","Speed"]]
 		#Note: there is just one branch with steer and speed
 
@@ -172,13 +177,13 @@ class configTrain(configMain):
 
 
 		self.loss_function = 'softmax_mse_branched'  # Chose between: mse_branched, mse_branched_ladd
-		self.learning_rate = 0.01 # First
+		self.learning_rate = 0.0002 # First
 		self.training_schedule = [[50000,0.5],[100000,0.5*0.5],[150000,0.5*0.5*0.5],[200000,0.5*0.5*0.5*0.5],[250000,0.5*0.5*0.5*0.5*0.5]]    # Number of iterations, multiplying factor
 		self.lambda_l2 = 1e-3 # Not used
-		self.branch_loss_weight = [0.5,0.5]
-		self.variable_weight = {'Steer':0.5,'Speed':0.5}
-		self.output_weigth = [0.5,0.5]
-		self.network_name = 'controlNetSpeedP'	
+		self.branch_loss_weight = [1.0]		#wights of each branch. wont matter for single branch case
+		self.variable_weight = {'Steer':0.875,'Speed':0.125}	#speed varies from 0 to 7, while steer from -1 to 1. thus bringing them to same scale
+		#self.output_weigth = [0.5,0.5]		#no longer used
+		self.network_name = 'controlNetSpeedP_softmax'	
 		self.lambda_tolerance = 5
 		self.is_training = True
 		self.set_unbalanced_loss = True # Not implemented
