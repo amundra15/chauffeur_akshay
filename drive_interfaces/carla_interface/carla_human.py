@@ -194,7 +194,7 @@ class CarlaHuman(Driver):
 		#control.gas = -(acc_axis -1)/2.0
 		if(self._new_speed - rewards.speed) > 0.05:
 			control.gas = ((self._new_speed - rewards.speed ) /2.5) + 0.4	# accl till carla speed nearly equal to actual speed, constant added to overcome friction
-		elif((self._new_speed - rewards.speed) < -0.05):
+		else:
 			control.gas = 0		#if required speed is less than carla speed, do nothing. car will automatically slow down due to friction
 		#control.brake = -(brake_axis -1)/2.0
 		#if control.brake < 0.001:

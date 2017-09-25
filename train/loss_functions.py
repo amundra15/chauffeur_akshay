@@ -1,6 +1,6 @@
 import tensorflow as tf
-
-
+import numpy as np
+to_print = True
 #def mse_branched(network_outputs,ground_truths,control_input,config):
 def mse_branched(network_outputs,ground_truths,config):
 #no changes in loss function as we have set number_steering_branches to 0, so the entire computation will happen only for main branch
@@ -28,6 +28,8 @@ def mse_branched(network_outputs,ground_truths,config):
 		#	network_outputs_split = network_outputs[i]
 		#else:
 		print network_outputs[i]
+
+
 		network_outputs_split =tf.split(network_outputs[i],network_outputs[i].get_shape()[1],1 )
 		#splits (?, 2) to (?, 1), (?, 1) ie steer and speed separated
 
@@ -42,9 +44,19 @@ def mse_branched(network_outputs,ground_truths,config):
 			# Get the target gt ( TODO: This should be a dictionary, I think it is more logical)
 			print 'target_name: '
 			print target_name
+
 			target_gt = ground_truths[config.targets_names.index(target_name)]
 			print 'target_gt: '
 			print target_gt
+
+			'''if (target_name == 'Steer' and to_print == True): 
+				# Save to file
+				#np.save(batch_steer.npy, target_gt )
+				np.save('data_stats' +'/' +'batch_steer.npy',target_gt)
+				global to_print
+				to_print = False'''
+
+
 			squared_dist = tf.pow(tf.subtract(target_gt, network_outputs_split[j]),2)
 			dist =tf.abs(tf.subtract(target_gt,  network_outputs_split[j]))
 			error_branch.append(dist)

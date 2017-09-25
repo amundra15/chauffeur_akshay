@@ -24,7 +24,11 @@ def softmax_mse_branched(network_outputs,ground_truths,config):
 		#	network_outputs_split = network_outputs[i]
 		#else:
 		print network_outputs[i]
+
+
+		#******this step will probably not work with one hot method, cos u may be(if branch_config = [["Steer","Steer","Steer","Speed"]]) dividing the 3 steer components in diff parts******
 		network_outputs_split =tf.split(network_outputs[i],network_outputs[i].get_shape()[1],1 )
+		#splits (?, 2) to (?, 1), (?, 1) ie steer and speed separated
 
 
 		print branches_configuration[i]
@@ -43,7 +47,19 @@ def softmax_mse_branched(network_outputs,ground_truths,config):
 			print target_gt
 
 			if target_name == 'Steer':
+				#convert gt to one-hot vectors, so that cross-entropy can be applied
+				target_gt_one_hot = one_hot(target_gt+1 ,3,axis=-1)	#adding 1 to target_gt converts -1,0,1 to 0,1,2, thus giving indices for corr. one_hot
+				#size will change from (?, 1) to (?, 1, 3)
 
+
+				#also, network structure ie prediction by network shoud be in one hot format
+
+
+				#assuming the labels(gt) and logits(predicted by network) are dimensionally compatible
+				cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=target_gt_one_hot, logits=network_outputs_split[j]))
+
+
+				#then see how to mix this "error" with speed error
 
 
 			else:

@@ -123,10 +123,18 @@ def train(gpu_number, experiment_name):
       save_model(saver,sess,config.models_path,i)
 
 
-    #   """ Run the training step and monitor its execution time """
+    '''if i == 0: 
+      
+      network_outputs_split =tf.split(training_manager._output_network[0],training_manager._output_network[0].get_shape()[1],1 )
+      for j in range(len(2)):
+        target_name = branches_configuration[i][j] # name of the target
 
-        
-    #   #print "NEXT STEP GETING"
+      target_gt = ground_truths[config.targets_names.index(target_name)]
+      print 'target_gt: '
+
+      if target_name == 'Steer': 
+      # Save to file
+      np.save(filename, target_gt )'''
 
     training_manager.run_train_step(batch_tensor,sess,i)
     #   #print "RUNNED STEP"

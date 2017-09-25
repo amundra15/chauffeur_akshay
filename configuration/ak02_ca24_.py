@@ -114,7 +114,7 @@ class configInput(configMain):
 		#with open(os.path.join(self.save_data_stats, 'path'),'r') as f:
 		#	path = f.read().strip()
 
-		path = '../AkshayData3'
+		path = '../AkshayData4'
 		
 		train_path = os.path.join(path, 'SeqTrain')
 		val_path = os.path.join(path, 'SeqVal')
@@ -172,10 +172,10 @@ class configTrain(configMain):
 
 
 		self.loss_function = 'mse_branched'  # Chose between: mse_branched, mse_branched_ladd
-		self.learning_rate = 0.01 # First
+		self.learning_rate = 0.0002 # First
 		self.training_schedule = [[50000,0.5],[100000,0.5*0.5],[150000,0.5*0.5*0.5],[200000,0.5*0.5*0.5*0.5],[250000,0.5*0.5*0.5*0.5*0.5]]    # Number of iterations, multiplying factor
 		self.lambda_l2 = 1e-3 # Not used
-		self.branch_loss_weight = [0.5]		#wights of each branch. wont matter for single branch case
+		self.branch_loss_weight = [1.0]		#wights of each branch. wont matter for single branch case
 		self.variable_weight = {'Steer':0.5,'Speed':0.5}
 		#self.output_weigth = [0.5,0.5]		#no longer used
 		self.network_name = 'controlNetSpeedP'	
@@ -214,10 +214,3 @@ class configOutput(configMain):
 
 		""" Feature Visualization Part """
 		# TODO : self.histograms_list=[]	self.features_to_draw=  self.weights_to_draw=
-
-
-
-
-
-
-# Changes on configTrain

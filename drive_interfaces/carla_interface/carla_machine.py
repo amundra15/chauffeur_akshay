@@ -234,9 +234,22 @@ class CarlaMachine(Runnable,Driver):
     #sensor = sensor[1]  #contains image
     capture_time = time.time()
 
-    sensor = sensor[65:265,:,:]
+    '''print "***"
+    print isinstance(sensor, tuple)
+    print isinstance(sensor, list)'''
+    #print isinstance(sensor[0], tuple)
+    print len(sensor[0])
+    print len(sensor[1])
+    print len(sensor[2])
+    sensor = sensor[65:265,:,:]   #sensor is a list
+    print '*****'
+    print len(sensor[0])
+    print len(sensor[1])
+    print len(sensor[2])
 
-    sensor = scipy.misc.imresize(sensor,[self._config.network_input_size[0],self._config.network_input_size[1]])
+    #imresize uses interpolation to resize images
+    #sensor = scipy.misc.imresize(sensor,[self._config.network_input_size[0],self._config.network_input_size[1]])
+    sensor = scipy.misc.imresize(sensor,[self._config.network_input_size[0],self._config.network_input_size[1],self._config.network_input_size[2]])
 
     image_input = sensor.astype(np.float32)
 
@@ -254,8 +267,8 @@ class CarlaMachine(Runnable,Driver):
     control = Control()
     control.steer = steer
     if(self._new_speed - rewards.speed) > 0.05:
-      control.gas = (self._new_speed - rewards.speed ) /2.5 # accl till carla speed nearly equal to actual speed
-    elif((self._new_speed - rewards.speed) < -0.05):
+      control.gas = ((self._new_speed - rewards.speed ) /2.5) + 0.4 # accl till carla speed nearly equal to actual speed. constant added to overcome friction
+    else:
       control.gas = 0   #if required speed is less than carla speed, do nothing. car will automatically slow down due to friction
     control.brake = 0
     control.hand_brake = 0
