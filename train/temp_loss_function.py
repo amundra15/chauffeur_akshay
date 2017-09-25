@@ -1,5 +1,6 @@
 
 
+
 #def mse_branched(network_outputs,ground_truths,control_input,config):
 def softmax_mse_branched(network_outputs,ground_truths,config):
 #no changes in loss function as we have set number_steering_branches to 0, so the entire computation will happen only for main branch
@@ -20,9 +21,6 @@ def softmax_mse_branched(network_outputs,ground_truths,config):
 		energy_branch =[]
 		error_branch =[]
 
-		#if network_outputs[i].get_shape()[1] == 1: # Size 1 cannot be splited
-		#	network_outputs_split = network_outputs[i]
-		#else:
 		print network_outputs[i]
 
 
@@ -58,8 +56,11 @@ def softmax_mse_branched(network_outputs,ground_truths,config):
 				#assuming the labels(gt) and logits(predicted by network) are dimensionally compatible
 				cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=target_gt_one_hot, logits=network_outputs_split[j]))
 
-
 				#then see how to mix this "error" with speed error
+
+
+				#also, in machine_output_function should convert one-hot back to a single integer(see file for trial code)
+
 
 
 			else:

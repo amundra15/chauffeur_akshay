@@ -241,7 +241,7 @@ class CarlaMachine(Runnable,Driver):
     print len(sensor[0])
     print len(sensor[1])
     print len(sensor[2])
-    sensor = sensor[65:265,:,:]   #sensor is a list
+    sensor = sensor[1][65:265,:,:]   #sensor is a list
     print '*****'
     print len(sensor[0])
     print len(sensor[1])

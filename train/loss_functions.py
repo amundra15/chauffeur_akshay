@@ -1,6 +1,8 @@
 import tensorflow as tf
-import numpy as np
-to_print = True
+
+#import numpy as np
+#to_print = True
+
 #def mse_branched(network_outputs,ground_truths,control_input,config):
 def mse_branched(network_outputs,ground_truths,config):
 #no changes in loss function as we have set number_steering_branches to 0, so the entire computation will happen only for main branch

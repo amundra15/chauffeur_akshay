@@ -51,6 +51,7 @@ class OutputManager(object):
 		self._merged = tf.summary.merge_all()
 		self._validater = ValidationManager(config,training_manager,sess,batch_tensor_val,self._merged)
 		self.first_time = True
+		self.store_steer = True
 
 
 
@@ -144,6 +145,25 @@ class OutputManager(object):
 		if i%self._config.validation_period == 0:
 
   			self._validater.run(i)
+
+
+  		'''if self.store_steer == True:
+  			network_outputs_split =tf.split(self._training_manager._output_network[0],self._training_manager._output_network[0].get_shape()[1],1 )
+      		branches_configuration = self._config.branch_config
+      
+      		target_name = branches_configuration[0][0] # name of the target is steer, when running ak02_ca24_steer
+      
+      		ground_truths = self._training_manager._targets_data
+      		target_gt = ground_truths[self._config.targets_names.index(target_name)]
+      		print target_gt
+      		print tf.Session().run(target_gt)
+
+      		if target_name == 'Steer': 
+        		# Save to file
+        		print 'saving steer values'
+        		np.savetxt('data_stats' +'/' +'batch_steer.npy',tf.Session().run(target_gt))
+  			
+  			self.store_steer = False'''
 
 
 
