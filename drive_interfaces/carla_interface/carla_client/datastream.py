@@ -36,7 +36,7 @@ def threaded(fn):
 
 class DataStream(object):
 
-    def __init__(self,image_x=400,image_y=300):
+    def __init__(self,image_x=640,image_y=480):
         self._data_buffer = Queue(1)
         self._image_x = image_x
         self._image_y = image_y
@@ -128,15 +128,13 @@ class DataStream(object):
             print("ERROR: No Data in 50 seconds, disconecting and reconecting from server ")
             self._running = False
             raise Empty
-        
+
+            
         
         else:
             self._data_buffer.task_done()
         finally:
-
-
             return data
-
 
     def start(self,socket):
 

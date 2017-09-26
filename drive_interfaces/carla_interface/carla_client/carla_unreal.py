@@ -35,7 +35,7 @@ class CarlaUnreal(object):
 		self._port_stream = self._port +1
 		#self._fps =config.fps
 
-		self._socket_world = socket_util.connect(self._host ,self._port)
+		self._socket_world = socket_util.pers_connect(self._host ,self._port)
 		logging.debug("Connected to Unreal Server World Socket")
 		self._socket_stream = 0
 		self._socket_control = 0
@@ -48,6 +48,7 @@ class CarlaUnreal(object):
 
 
 	def setIniFile(self,config_path):
+		
 		self._config_path = config_path
 		logging.debug('set config path as port %s' % config_path)
 
@@ -59,9 +60,9 @@ class CarlaUnreal(object):
 
 
 		logging.debug("Going to Connect Stream and start thread")
-		self._socket_stream = socket_util.connect(self._host ,self._port_stream)
+		self._socket_stream = socket_util.pers_connect(self._host ,self._port_stream)
 
-		self._socket_control = socket_util.connect(self._host ,self._port_control)
+		self._socket_control = socket_util.pers_connect(self._host ,self._port_control)
 		logging.debug("Control Socket Connected")
 
 		self._data_stream.start(self._socket_stream)
@@ -72,39 +73,53 @@ class CarlaUnreal(object):
 
 	def receiveSceneConfiguration(self):
 
+		try:
+			data = socket_util.get_message(self._socket_world)
+			scene = Scene()
+			scene.ParseFromString(data)
+			logging.debug("Received Scene Configuration")
 
-		data = socket_util.get_message(self._socket_world)
+			# parsing positions
+			positions = []
+			number_of_positions = len(scene.positions)/8 # Every 8 bytes you have a position
+			for i in range(0,number_of_positions*2,2):
+				x = struct.unpack('f', scene.positions[i*4:(i+1)*4])[0]
+				y = struct.unpack('f', scene.positions[(i+1)*4:(i+2)*4])[0]
+				positions.append((x,y))
 
-		scene = Scene()
-		scene.ParseFromString(data)
-		logging.debug("Received Scene Configuration")
+			return scene,positions
 
-		# parsing positions
-		positions = []
-		number_of_positions = len(scene.positions)/8 # Every 8 bytes you have a position
-		for i in range(0,number_of_positions*2,2):
-			x = struct.unpack('f', scene.positions[i*4:(i+1)*4])[0]
-			y = struct.unpack('f', scene.positions[(i+1)*4:(i+2)*4])[0]
-			positions.append((x,y))
-
-		#print (positions)
-
-        #for i in range(len(reward.images_sizes)):   # get each size of the images
-
-
-		return scene,positions
+		except:
+			logging.debug("Died When receiving configuration")
+			return self.restart()
 
 
-	def requestNewEpisode(self):
+
+
+		
+
+
+	def requestNewEpisode(self,ini_file=None):
 
 
 		requestEpisode = RequestNewEpisode()
-		with open (self._config_path, "r") as myfile:
-   				data=myfile.read()
+		if ini_file ==None: # You can send a new ini file to be open, if not open the one defined on start
+			ini_path =self._config_path
+		else:
+			ini_path = ini_file
+
+		with open (ini_path, "r") as myfile:
+			data=myfile.read()
 		logging.debug("Set the Init File")
-		print (data)
+		
 		requestEpisode.init_file = data
-		socket_util.send_message(self._socket_world,requestEpisode)
+		try:
+			socket_util.send_message(self._socket_world,requestEpisode)
+		except:
+			logging.debug("Died When requesting new episode")
+			self.restart()
+
+
 		logging.debug("Send the new episode Request")
 
 
@@ -116,14 +131,25 @@ class CarlaUnreal(object):
 		scene_init = EpisodeStart()
 		scene_init.start_index = start_index
 		scene_init.end_index = end_index
-		socket_util.send_message(self._socket_world,scene_init)
+		try:
+			socket_util.send_message(self._socket_world,scene_init)
+		except:
+			logging.debug("Died When confirming new episode")
+			self.restart()
+
+
 		logging.debug("Send the new episode Message")
 		episode_ready = EpisodeReady()
 		episode_ready.ready = False
 		self._data_stream.clean()
-		while not episode_ready.ready:
-			data = socket_util.get_message(self._socket_world)
-			episode_ready.ParseFromString(data)
+		try:
+			while not episode_ready.ready:
+				data = socket_util.get_message(self._socket_world)
+				episode_ready.ParseFromString(data)
+		except:
+
+			logging.debug("Died when trying to receive episode reading")
+			self.restart()
 
 
 		logging.debug("Episode is Ready")
@@ -134,15 +160,16 @@ class CarlaUnreal(object):
 
 	def getReward(self):
 		logging.debug("Got A new Reward")
-		try:
-			reward_data = self._data_stream.get_the_latest_data()
-		except:
-			logging.debug("Got an empty reward") 
-		 	self.restart()
-		 	reward_data = self._data_stream.get_the_latest_data()
-		finally:
-			return reward_data
-		
+
+		while True:
+			try:
+				reward_data = self._data_stream.get_the_latest_data()
+				return reward_data
+			except:
+				logging.debug("Got an empty reward") 
+			 	self.restart()
+
+	 	return reward_data
 
 	""" Command contains:
 		Steering: -1 to 1
@@ -178,10 +205,17 @@ class CarlaUnreal(object):
 		self._data_stream = DataStream(self._image_x,self._image_y)
 		self.startAgent()
 		self.requestNewEpisode()
-		self.receiveSceneConfiguration()
+		scene,positions = self.receiveSceneConfiguration()
 		self.newEpisode(self._latest_start,self._latest_end)
 		logging.debug("restarted the world connection") 
+		return scene,positions
 
+	def stop(self):
+		self.close_conections()
+		connected = False 
+
+		self._data_stream._running = False
+		self._data_stream = DataStream(self._image_x,self._image_y)
 
 	def close_conections(self):
 

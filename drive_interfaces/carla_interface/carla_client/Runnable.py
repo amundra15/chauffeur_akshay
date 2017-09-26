@@ -58,11 +58,19 @@ class Runnable(object, ):
         accum_sidewalk_intersect = 0.0
         distance = 100000
         reward_vec=[]
+        total_turns = 0
+        number_turns = 0
+        reward = data[0]
+        distance_ini = self.compute_distance([reward.player_x, reward.player_y], [reward.player_x, reward.player_y], target)
+
         while((t1-t0) < (time_out*1000) and not success):
             data = carla.getReward()
-            control = self.run_step(data,target)
+            control,made_turn,completed_turn = self.run_step(data,target)
             carla.sendCommand(control)
-
+            if completed_turn:
+                total_turns +=1
+            if made_turn:
+                number_turns+=1
 
             # meassure distance to target
             reward = data[0]
@@ -84,7 +92,7 @@ class Runnable(object, ):
 
             distance = self.compute_distance([curr_x, curr_y], [prev_x, prev_y], target)
             # debug 
-            print('[d=%f] c_x = %f, c_y = %f ---> t_x = %f, t_y = %f' % (float(distance), curr_x, curr_y, target[0], target[1]))
+            print('[c=%d] [t=%d] [d=%f] c_x = %f, c_y = %f ---> t_x = %f, t_y = %f' % (total_turns,number_turns,float(distance), curr_x, curr_y, target[0], target[1]))
 
             if(distance < 200.0):
                 success = True
@@ -96,6 +104,6 @@ class Runnable(object, ):
 
 
         if(success):
-            return (1, reward_vec, float(t1-t0)/1000.0,distance)
+            return (1, reward_vec,distance_ini, float(t1-t0)/1000.0,distance,float(total_turns)/float(number_turns+1),number_turns)
         else:
-            return (0, reward_vec, time_out,distance)
+            return (0, reward_vec,distance_ini, time_out,distance,float(total_turns)/float(number_turns+1),number_turns)

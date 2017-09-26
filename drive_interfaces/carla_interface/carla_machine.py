@@ -234,18 +234,8 @@ class CarlaMachine(Runnable,Driver):
     #sensor = sensor[1]  #contains image
     capture_time = time.time()
 
-    '''print "***"
-    print isinstance(sensor, tuple)
-    print isinstance(sensor, list)'''
-    #print isinstance(sensor[0], tuple)
-    print len(sensor[0])
-    print len(sensor[1])
-    print len(sensor[2])
-    sensor = sensor[1][65:265,:,:]   #sensor is a list
-    print '*****'
-    print len(sensor[0])
-    print len(sensor[1])
-    print len(sensor[2])
+
+    sensor = sensor[0][65:265,:,:]   #sensor's first dimension contains the tuple of images from diff cameras. we have just one, and are aceessing that using [0]
 
     #imresize uses interpolation to resize images
     #sensor = scipy.misc.imresize(sensor,[self._config.network_input_size[0],self._config.network_input_size[1]])
@@ -266,8 +256,8 @@ class CarlaMachine(Runnable,Driver):
 
     control = Control()
     control.steer = steer
-    if(self._new_speed - rewards.speed) > 0.05:
-      control.gas = ((self._new_speed - rewards.speed ) /2.5) + 0.4 # accl till carla speed nearly equal to actual speed. constant added to overcome friction
+    if(_new_speed - rewards.speed) > 0.05:
+      control.gas = ((_new_speed - rewards.speed ) /2.5) + 0.4 # accl till carla speed nearly equal to actual speed. constant added to overcome friction
     else:
       control.gas = 0   #if required speed is less than carla speed, do nothing. car will automatically slow down due to friction
     control.brake = 0

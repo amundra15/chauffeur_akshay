@@ -132,7 +132,7 @@ class Recorder(object):
 
 
 		if self._record_image_hdf5:
-			image = image[130:530,:,:]	#hard code to resize image to 200,100,3
+			image = image[0][130:530,:,:]	#hard code to resize image to 200,100,3
 			image = scipy.misc.imresize(image,[self._image_size2,self._image_size1])
 			self.data_center[pos] = image
 		

@@ -2,6 +2,7 @@ import binascii
 import socket
 import struct
 import logging
+import time
 
 def int2bytes(i):
     hex_string = '%x' % i
@@ -22,7 +23,20 @@ def connect(host,port):
 	sock.connect((host,port))
 
 	return sock
+	
+def pers_connect(host,port):
+	for attempt in range(100):
+		try:
+			sock = connect(host,port)
+		except:
+			logging.debug( "Failure on connection")
+			time.sleep(1)
+			continue
+		else:
 
+			break
+
+	return sock
 
 def send_message(sock, message):
 	""" Send a serialized message (protobuf Message interface)

@@ -106,19 +106,27 @@ def single_branch(image_input,config,sess,train_manager):
   feedDict = {x: image_input,dout: [1]*len(config.dropout) }
 
 
-  output_all = sess.run(all_net, feed_dict=feedDict)
+  output_all = sess.run(all_net, feed_dict=feedDict)    #when fetches in a tensor, the fetched value will be a numpy ndarray containing the value of that tensor
 
 
   #******you will have to convert one-hot vectors back to a single steering variable*******
   #index = tf.argmax(one_hot_vector, axis=1)  #something like this
 
 
+  '''print len(output_all)   #1
+  print len(output_all[0])  #1
+  print len(output_all[0][0]) #2
+  print output_all[0][0][0]   #prints steer value
+  print output_all[0][0][1]   #prints speed value'''
 
-  predicted_steers = (output_all[0][0])
+  '''predicted_steers = (output_all[0][0][0])
   for i in range(len(predicted_steers)):
-    predicted_steers[i] = int(round(predicted_steers[i]))
+    predicted_steers[i] = int(round(predicted_steers[i]))'''
 
-  predicted_speed = (output_all[0][1])
+  predicted_steers = int(round(output_all[0][0][0]))
+
+
+  predicted_speed = (output_all[0][0][1])
 
   #predicted_acc = (output_all[0][1])
 

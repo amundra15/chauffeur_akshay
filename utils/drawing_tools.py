@@ -135,7 +135,7 @@ def draw_path_on(img, speed_ms, angle_steers, color=(0,0,255)):
 
 def draw_bar_on(img,bar_intensity,y_pos,color=(0,0,255)):
 
-
+  
   bar_size = int(img.shape[1]/6 * bar_intensity)
   initial_x_pos = img.shape[1] - img.shape[1]/6
   #print bar_intensity

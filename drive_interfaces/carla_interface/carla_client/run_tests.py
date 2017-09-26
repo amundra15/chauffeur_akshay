@@ -103,7 +103,7 @@ def load_carla_0_parameters():
                  8, # ClearSunset
             ]
     
-    repetitions_per_experiment = [3, 3, 3, 3]
+    repetitions_per_experiment = [1, 1, 1, 1]
     
     poses_exp1 = [[38, 34],  [4, 2], [12, 10], [62, 82], [42, 50],\
               [66, 64], [78, 76],[57,59],[61,66],[35,39],\
@@ -175,7 +175,7 @@ def load_carla_1_parameters():
                  14 # Soft Rain Sunset
             ]
     
-    repetitions_per_experiment = [3, 3, 3, 3]
+    repetitions_per_experiment = [1, 1, 1, 1]
     
     poses_exp1 = [[36,40],[39,35],[110,114],[7,3],[0,4],\
                 [68,50],[61,59],[47,64],[147,90],[33,87],\
@@ -201,7 +201,11 @@ def load_carla_1_parameters():
                [148,129],[65,18],[21,16],[147,97],[42,51],\
                [30,41],[18,107],[69,45],[102,95],[18,145],\
                [111,64],[79,45],[84,69],[73,31],[37,81],\
-               [42,1],[1,42],[32,37],[100,137],[104,7]]
+               [42,1],[1,42],[32,37],[100,137],[104,7],\
+               [1,42],[37,32],[137,100],[7,104],[34,70],\
+               [65,143],[64,97],[97,64],[121,85],[85,121],\
+               [137,104],[104,137],[72,95],[95,72],[39,65],\
+               [65,39],[96,142],[142,96],[7,115],[115,7]]
 
     pedestrians_exp3 = [ 0] * len(poses_exp3)
     vehicles_exp3 = [ 0] * len(poses_exp3)
@@ -211,11 +215,15 @@ def load_carla_1_parameters():
                [148,129],[65,18],[21,16],[147,97],[42,51],\
                [30,41],[18,107],[69,45],[102,95],[18,145],\
                [111,64],[79,45],[84,69],[73,31],[37,81],\
-               [42,1],[1,42],[32,37],[100,137],[104,7]]
+               [42,1],[1,42],[32,37],[100,137],[104,7],\
+               [1,42],[37,32],[137,100],[7,104],[34,70],\
+               [65,143],[64,97],[97,64],[121,85],[85,121],\
+               [137,104],[104,137],[72,95],[95,72],[39,65],\
+               [65,39],[96,142],[142,96],[7,115],[115,7]]
 
 
-    pedestrians_exp4 = [ 50] * len(poses_exp4)
-    vehicles_exp4 = [ 20] * len(poses_exp4)
+    pedestrians_exp4 = [ 100] * len(poses_exp4)
+    vehicles_exp4 = [ 40] * len(poses_exp4)
     
     
     start_goal_poses = [poses_exp1, poses_exp2, poses_exp3, poses_exp4]
@@ -255,6 +263,8 @@ def run_experiment(opt_dict):
                   'initial_distance':-1,
                   'final_distance':-1,
                   'final_time':-1,
+                  'completed_turns':-1,
+                  'turns_made':-1,
 
                  }
 
@@ -323,7 +333,7 @@ def run_experiment(opt_dict):
 
                             # running the agent
                             print('======== !!!! ==========')
-                            (result, reward_vec, final_time,distance) = runnable.run_until(carla, time_out[experiment_id], positions[end_point])
+                            (result, reward_vec,distance_ini, final_time,distance,completed_turns,turns_made) = runnable.run_until(carla, time_out[experiment_id], positions[end_point])
                             
                             # compute stats for the experiment
                             dict_stats['exp_id'] = experiment_id
@@ -332,9 +342,11 @@ def run_experiment(opt_dict):
                             dict_stats['start_point'] = start_point
                             dict_stats['end_point'] = end_point
                             dict_stats['result'] = result
-                            dict_stats['initial_distance'] = distance
+                            dict_stats['initial_distance'] = distance_ini
                             dict_stats['final_distance'] = distance
                             dict_stats['final_time'] = final_time
+                            dict_stats['completed_turns'] = completed_turns
+                            dict_stats['turns_made'] = turns_made
 
                             for i in range(len(reward_vec)):
                                 dict_rewards['collision_gen'] = reward_vec[i].collision_gen

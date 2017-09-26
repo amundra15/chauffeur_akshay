@@ -93,6 +93,12 @@ def create_structure(tf, x, input_size,dropout,config):
 
 
 
+	'''print tf.shape(branches)		#prints shape=(3,). ie, it has 3 dimensions
+	print tf.shape(branches[0])		#prints shape=(2,). we have selected our only branch
+	print tf.shape(branches[0][0])	#prints shape=(1,). we have selected steer
+	print tf.shape(branches[0][1])	#prints shape=(1,). we have selected speed'''
+
+
 	weights = network_manager.get_weigths_dict()
 
 	features = network_manager.get_feat_tensors_dict()

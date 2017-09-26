@@ -85,7 +85,7 @@ def use_example(path_config,port = 2000, host ='127.0.0.1'):
 			capture = time.time()
 			i+=1
 			#print ('i= ',i)
-			if i % 100 ==0:
+			if i % 1000 ==0:
 				carla.requestNewEpisode()
 				scene,positions = carla.receiveSceneConfiguration()
 				if positions_it < len(positions):

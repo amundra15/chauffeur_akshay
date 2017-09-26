@@ -138,7 +138,7 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 
 			if show_screen:
 				if game == "Carla":
-
+					#print len(image)
 					screen_manager.plot_driving_interface( capture_time,np.copy(image),\
 						action,action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
 						drifting_time,will_drift,rewards.speed,new_speed,0,0,0) #
