@@ -20,7 +20,9 @@ class Noiser(object):
 	# NOISER CARLA CONFIGURATION
 	# intensity = 5 ,min_noise_time_amount =0.5
 
-	def __init__(self,noise_type,frequency=15,intensity = 5,min_noise_time_amount =0.5):
+	def __init__(self,noise_type,frequency=15,intensity = 30,min_noise_time_amount =0.5):
+	#intensity controls the amplitude
+	#frequency - number of seconds in a minute you want noise
 
 
 
@@ -30,7 +32,7 @@ class Noiser(object):
 		self.noise_start_time =time.time()
 		self.noise_end_time =time.time()+1
 		self.min_noise_time_amount = min_noise_time_amount
-		self.noise_time_amount =min_noise_time_amount + float(random.randint(50,200)/100.0)
+		self.noise_time_amount =min_noise_time_amount + float(random.randint(50,150)/100.0)
 		self.second_counter = time.time()
 		self.steer_noise_time =0
 		self.intensity =intensity
@@ -40,7 +42,7 @@ class Noiser(object):
 
 	def set_noise(self):
 
-		if self.noise_type == 'Spike':# spike noise there are no variations on current noise over time
+		if self.noise_type == 'Spike' or 'Square':# spike noise there are no variations on current noise over time
 
 			# flip between positive and negative
 			coin = random.randint(0,1)
@@ -61,17 +63,38 @@ class Noiser(object):
 
 				return max(-0.55,self.current_noise_mean - (time.time() -self.noise_start_time)*0.03*self.intensity)
 
+
+		if self.noise_type == 'Square':
+			if self.current_noise_mean >0:
+
+				return min(1.0,self.current_noise_mean + (time.time() -self.noise_start_time)*0.03 *self.intensity)
+			else:
+
+				return max(-1.0,self.current_noise_mean - (time.time() -self.noise_start_time)*0.03*self.intensity)
+
+
+
 	def get_noise_removing(self):
 		#print 'REMOVING'
 		added_noise = (self.noise_end_time -self.noise_start_time)*0.02 *self.intensity
 		#print added_noise
-		if self.noise_type == 'Spike':
+		if self.noise_type == 'Spike' :
 			if self.current_noise_mean >0:
 				added_noise = min(0.55,added_noise+self.current_noise_mean)
 				return  added_noise - (time.time() -self.noise_end_time)*0.03*self.intensity
 			else:
 				added_noise = max(-0.55,self.current_noise_mean - added_noise)
 				return added_noise + (time.time() -self.noise_end_time)*0.03*self.intensity
+
+
+		if self.noise_type == 'Square':
+			if self.current_noise_mean >0:
+				added_noise = min(1.0,added_noise+self.current_noise_mean)
+				return  added_noise - (time.time() -self.noise_end_time)*0.03*self.intensity
+			else:
+				added_noise = max(-1.0,self.current_noise_mean - added_noise)
+				return added_noise + (time.time() -self.noise_end_time)*0.03*self.intensity
+
 
 
 	def is_time_for_noise(self,steer):
@@ -97,7 +120,8 @@ class Noiser(object):
 			#print "TIME REMOVING ",(time.time()-self.noise_end_time)
 			if (time.time()-self.noise_end_time) >(self.noise_time_amount): # if half the amount put passed
 				self.remove_noise = False
-				self.noise_time_amount = self.min_noise_time_amount + float(random.randint(50,200)/100.0)
+
+				self.noise_time_amount = self.min_noise_time_amount + float(random.randint(50,150)/100.0)
 				return False	
 			else:
 				return True
@@ -133,19 +157,19 @@ class Noiser(object):
 
 
 
+
 		if self.noise_type == 'Spike':
 
 			if self.is_time_for_noise(action.steer):
 				steer = action.steer
 
 				if self.remove_noise:
-					steer_noisy = max(min(steer + self.get_noise_removing(),1),-1)
+					steer_noisy = max(min(steer + self.get_noise_removing(),1.0),-1.0)
 
 				else:
-					steer_noisy = max(min(steer+ self.get_noise(),1),-1)	
+					steer_noisy = max(min(steer+ self.get_noise(),1.0),-1.0)	
 							
 
-				
 				noisy_action = Control()
 				noisy_action.steer = steer_noisy
 				noisy_action.gas = action.gas 
@@ -155,12 +179,69 @@ class Noiser(object):
 				#print 'timefornosie'
 				return noisy_action,False,not self.remove_noise
 				
-
-
-
 			else:
 				return action,False,False
-			
+
+
+
+		if self.noise_type == 'Square':
+
+			if self.is_time_for_noise(action.steer):
+				steer = action.steer
+
+				'''if self.remove_noise:
+					steer_noisy = max(min(steer + self.get_noise_removing(),1),-1)	#steer_noisy is the resultant of steer and noise
+
+				else:
+					steer_noisy = max(min(steer+ self.get_noise(),1),-1)	
+							
+
+
+				if steer_noisy > 0.5:
+					steer_noisy = 1.0
+				elif steer_noisy < -0.5:
+					steer_noisy = -1.0
+				else:
+					steer_noisy = 0.0'''
+
+
+				if self.remove_noise:
+					noise_added = self.get_noise_removing()
+				else:
+					noise_added = self.get_noise()
+
+				#print noise_added
+
+				if noise_added > 0.35:
+					noise_added = 1.0
+				elif noise_added < -0.35:
+					noise_added = -1.0
+				else:
+					noise_added = 0.0				
+
+				#print noise_added
+				steer_noisy = max(min(steer+ noise_added,1.0),-1.0)	
+				#print steer_noisy			
+
+
+
+				noisy_action = Control()
+				noisy_action.steer = steer_noisy
+				noisy_action.gas = action.gas 
+				noisy_action.brake = action.brake
+				noisy_action.hand_brake = action.hand_brake
+				noisy_action.reverse= action.reverse
+				#print 'timefornosie'
+				return noisy_action,False,not self.remove_noise
+				
+			else:
+				return action,False,False
+
+
+		
+
+
+
 		if self.noise_type == 'Manual':
 			if self.is_time_for_noise(action.steer):
 
