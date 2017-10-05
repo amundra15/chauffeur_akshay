@@ -6,11 +6,13 @@ sys.path.append('train')
 sys.path.append('utils')
 sys.path.append('input/spliter')
 sys.path.append('structures')
+sys.path.append('drive_interfaces/configuration/')
 
 
 
 import argparse
 from drive import drive
+from drive_elektra import drive_elektra
 from train import train
 from evaluate import evaluate  # General evaluation algorithm ( train again for a while and check network stile)
 """ Also import the module testing scripts """
@@ -20,6 +22,60 @@ from test_train import test_train
 import os
 
 import logging
+
+
+
+
+def parse_drive_arguments(args,driver_conf):  #used only  for drive_elektra 
+#override variables of elektra_drive_config if they are passed from command line
+
+
+  # Carla Config
+  if args.carla_config is not None:
+    driver_conf.carla_config = args.carla_config
+
+
+  if args.host is not None:
+    driver_conf.host = args.host
+
+  if args.port is not None:
+    driver_conf.port = int(args.port)
+
+  if args.path is not None:
+    driver_conf.path = args.path
+
+  if args.noise is not None:
+    driver_conf.noise = args.noise
+  if args.driver  is not None:
+    driver_conf.type_of_driver = args.driver
+  if args.game is not None:
+    driver_conf.game = args.game
+  '''if args.number_screens is not None:
+    driver_conf.number_screens = args.number_screens
+  if args.scale_factor is not None:
+    driver_conf.scale_factor = args.scale_factor'''
+
+  if args.resolution is not None:
+    res_string = args.resolution.split(',')
+    resolution = []
+    resolution.append(int(res_string[0]))
+    resolution.append(int(res_string[1]))
+    driver_conf.resolution = resolution
+
+
+
+  '''if args.image_cut is not None:
+    cut_string = args.image_cut.split(',')
+    image_cut = []
+    image_cut.append(int(cut_string[0]))
+    image_cut.append(int(cut_string[1]))
+    driver_conf.image_cut = image_cut'''
+
+
+
+  return driver_conf
+
+
 
 
 
@@ -39,6 +95,7 @@ if __name__ == '__main__':
   
 
   # Drive
+  parser.add_argument('-dc', '--driver_config', help="Drive config file used for driving(just for elektra right now)", default="elektra_drive_config")
   parser.add_argument('-cc', '--carla-config', help="Carla config file used for driving", default="./drive_interfaces/carla_interface/CarlaSettings.ini")
   parser.add_argument('-l', '--host', type=str, default='158.109.9.238', help='The IP where DeepGTAV is running')
   parser.add_argument('-p', '--port', default=8000, help='The port where DeepGTAV is running')  
@@ -78,8 +135,15 @@ if __name__ == '__main__':
   try:
 
     if args.mode == 'drive':
+      if args.game == 'Elektra':  #can later be clubbed with general case(handle drive_config object)
+        driver_conf_module  = __import__(args.driver_config)
+        driver_conf= driver_conf_module.configDrive()
+        driver_conf = parse_drive_arguments(args,driver_conf)   #****TODO: check what this does
+        #drive_elektra(args.experiment_name,driver_conf,args.name,args.memory)
+        drive_elektra(args.experiment_name,driver_conf,args.name)
 
-      drive(args.host,int(args.port),args.gpu,args.path,args.show_screen,resolution,args.noise,args.carla_config,args.driver,args.experiment_name,args.city,args.game,args.name)
+      else:
+        drive(args.host,int(args.port),args.gpu,args.path,args.show_screen,resolution,args.noise,args.carla_config,args.driver,args.experiment_name,args.city,args.game,args.name)
 
     elif args.mode == 'train':
       #from config import *

@@ -181,7 +181,7 @@ while rval:
 	print '%30s' % 'Grabbed camera frame in ', str((end - start)*1000), 'ms'
 
 	start = time.time()
-	frame = cv2.resize(frame, (input_shape[3],input_shape[2]))
+	frame = cv2.resize(frame, (º[3],input_shape[2]))
 	input_image = frame.transpose((2,0,1))
 	# input_image = input_image[(2,1,0),:,:] # May be required, if you do not open your data with opencv
 	input_image = np.asarray([input_image])

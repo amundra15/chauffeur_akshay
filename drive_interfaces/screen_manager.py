@@ -232,22 +232,32 @@ class  ScreenManager(object):
 		#a = sensor_data.shape
 		#print a
 		#print len(a)
-		no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
-		#print sensor_data
-		#print '************'
-		# Define our fonts
+		#no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
+		size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why changed from above to this suddenly!
+
 
 
 		#draw_path_on(img, 10, -angle_steers*40.0)
 		
-		draw_path_on(sensor_data[0], 20, -steer_noisy*20.0, (255, 0, 0))
+		'''draw_path_on(sensor_data[0], 20, -steer_noisy*20.0, (255, 0, 0))
 		draw_path_on(sensor_data[0], 20, -steer*20.0, (0, 255, 0))
 
 		draw_bar_on(sensor_data[0],acc,int(1.5*sensor_data.shape[0]/8),(0,255,0))
 		draw_bar_on(sensor_data[0],brake,int(2*sensor_data.shape[0]/8),(255,0,0))
 
 
-		self.set_array(sensor_data[0],screen_number)
+		self.set_array(sensor_data[0],screen_number)'''
+
+
+
+		draw_path_on(sensor_data, 20, -steer_noisy*20.0, (255, 0, 0))
+		draw_path_on(sensor_data, 20, -steer*20.0, (0, 255, 0))
+
+		draw_bar_on(sensor_data,acc,int(1.5*sensor_data.shape[0]/8),(0,255,0))
+		draw_bar_on(sensor_data,brake,int(2*sensor_data.shape[0]/8),(255,0,0))
+
+
+		self.set_array(sensor_data,screen_number)
 		#pygame.surfarray.blit_array(activation_surface, img_act)
 
 		#pygame.display.flip()
@@ -407,4 +417,3 @@ class  ScreenManager(object):
 
 
 		self._render_iter +=1
-

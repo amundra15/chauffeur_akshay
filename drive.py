@@ -84,7 +84,7 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 	recorder = Recorder(path + folder_name +'/',100,200)
 	#Note: resolution size is 400,300. but we give input to network 200,100 by cropping it.
 	direction = 2
-	old_speed = 0
+	old_speed = 0		#the speed we start the car with
 
 	iteration = 0
 	try:

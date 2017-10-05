@@ -28,9 +28,9 @@ class CarlaHuman(Driver):
 
 
 		Driver.__init__(self)
-		self._straight_button = False
+		'''self._straight_button = False
 		self._left_button = False
-		self._right_button = False
+		self._right_button = False'''
 		self._recording= False
 
 		self._rear = False
