@@ -66,7 +66,7 @@ class ElektraHuman(Driver):
     # Start any background process... etc.
 
     # Start the interface with the joystick 
-    pygame.joystick.init()
+    #pygame.joystick.init()
     joystick_count = pygame.joystick.get_count()
     if joystick_count >1:
       print "Please Connect Just One Joystick"
@@ -74,6 +74,11 @@ class ElektraHuman(Driver):
     print joystick_count
     self.joystick = pygame.joystick.Joystick(0)
     self.joystick.init()
+    print "check init"
+    print self.joystick.get_init()
+    print self.joystick.get_id()
+    print self.joystick.get_numbuttons()
+
 
 
   def get_recording(self):
@@ -102,9 +107,17 @@ class ElektraHuman(Driver):
     self._old_speed = speed
     global start_time
 
+    print "check init"
+    print self.joystick.get_init()
+
     """ Get Steering """
+    print "check left button"
+    print self.joystick.get_button( 6 )
+
+
     if self.joystick.get_button( 6 ):  #left
       self.steering_direction = -1
+      print "left"
     elif self.joystick.get_button( 7 ): #right
       self.steering_direction = 1
     else:

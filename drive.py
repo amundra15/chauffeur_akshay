@@ -114,7 +114,7 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 
 
 
-			recording = driver.get_recording()
+			recording = driver.get_recording() 			#just booleans, received from joystick
 
 
 

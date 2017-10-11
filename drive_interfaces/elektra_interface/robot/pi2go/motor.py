@@ -96,7 +96,7 @@ try:
                         pi2go.forward(speed)
                         turnflag = 's'
 
-                elif turnflag == 'r':				#Wheel at right
+        elif turnflag == 'r':				#Wheel at right
 			pi2go.spinLeft(speed, roll)
                         # sleep for 1s
                         time.sleep(0.9)

@@ -129,12 +129,9 @@ def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
 			#print 'fps',1.0/(time.time() - capture_time)
 			#sensor_data = frame2numpy(image,[800,600])
 
-
-			if drive_config.show_screen:
-				for event in pygame.event.get(): # User did something
-					if event.type == pygame.QUIT: # If user clicked close
-						done=True # Flag that we are done so we exit this loop
-
+			for event in pygame.event.get(): # User did something
+				if event.type == pygame.QUIT: # If user clicked close
+					done=True # Flag that we are done so we exit this loop
 
 
 			recording = driver.get_recording()		#just booleans, received from joystick
@@ -147,8 +144,8 @@ def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
 			action_noisy,drifting_time,will_drift = noiser.compute_noise(action)
 			
 			#print action
-			if recording:
-				
+			if recording:	
+				print "Recording"			
 				recorder.record(images,rewards,action,action_noisy)
 
 			#print "RECORDING ? ",recording and not exist_noise
