@@ -81,7 +81,7 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 
 	folder_name = str(datetime.datetime.today().day) +'_'+drivers_name
 	folder_name += '_'+ str(get_latest_file_number(path,folder_name))
-	recorder = Recorder(path + folder_name +'/',100,200)
+	recorder = Recorder(path + folder_name +'/',88,200)
 	#Note: resolution size is 400,300. but we give input to network 200,100 by cropping it.
 	direction = 2
 	old_speed = 0		#the speed we start the car with
@@ -114,7 +114,7 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 
 
 
-			recording = driver.get_recording() 			#just booleans, received from joystick
+			recording = driver.get_recording()
 
 
 

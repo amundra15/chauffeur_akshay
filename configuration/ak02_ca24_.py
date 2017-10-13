@@ -38,8 +38,8 @@ class configMain:
 		#self.input_size = (227,227,3)
 		#self.manager_name = 'control_speed' 
 		# y , x
-		self.image_size = (100,200,3)
-		self.network_input_size = (100,200,3)
+		self.image_size = (88,200,3)
+		self.network_input_size = (88,200,3)
 		self.variable_names = ['Steer','Gas','Brake','Hand_B','Reverse','Steer_N','Gas_N','Brake_N','Pos_X','Pos_Y','Speed',\
 						'C_Gen','C_Ped','C_Car','Road_I','Side_I','Acc_x','Acc_y','Acc_z','Plat_Ts','Game_Ts','Ori_X','Ori_Y','Ori_Z','Control','Noise']
 		# _N is noise, Yaw_S is angular speed

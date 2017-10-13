@@ -6,6 +6,9 @@ import pygame
 
 import subprocess
 
+import datetime
+start_time = datetime.datetime.now()
+
 import copy
 from driver import *
 import logging
@@ -14,12 +17,12 @@ import logging
 
 import socket
 
-camera_port = 0   # Change this to your webcam ID, or file name for your video file
+camera_port = 1   # Change this to your webcam ID, or file name for your video file
 ramp_frames = 15  #Number of frames to throw away while the camera adjusts to light levels
 #rval = True
 
 UDP_IP = "10.42.0.144"
-UDP_PORT = 5050
+UDP_PORT = 5007
 sock = socket.socket(socket.AF_INET, # Internet
           socket.SOCK_DGRAM) # UDP
 
@@ -55,30 +58,27 @@ class ElektraHuman(Driver):
   # Start the communication process and any necessary threads or other process
   def start(self):
 
-    # Starts the communication with raspy
-    import subprocess
+    # Starts the communication with raspy - do it manually now by sshing to pi and running motor.py(below code works, but cos pi has infinite loop, control never returns to execute remaining code)
+    '''import subprocess
     print "start"
-    subprocess.call("./connect_pi.sh", shell=True)
-    print "end"
+    subprocess.call("$HOME/chauffeur_akshay_github/drive_interfaces/elektra_interface/connect_pi.sh", shell=True)
+    print "end"	 '''
 
     # Starts communication with the cameras
     
     # Start any background process... etc.
 
     # Start the interface with the joystick 
-    #pygame.joystick.init()
+    pygame.joystick.init()
     joystick_count = pygame.joystick.get_count()
     if joystick_count >1:
       print "Please Connect Just One Joystick"
       raise 
-    print joystick_count
+    #print "joystick count:"
+    #print joystick_count
     self.joystick = pygame.joystick.Joystick(0)
     self.joystick.init()
-    print "check init"
-    print self.joystick.get_init()
-    print self.joystick.get_id()
-    print self.joystick.get_numbuttons()
-
+    #print self.joystick.get_numbuttons()
 
 
   def get_recording(self):
@@ -107,24 +107,20 @@ class ElektraHuman(Driver):
     self._old_speed = speed
     global start_time
 
-    print "check init"
-    print self.joystick.get_init()
-
+    #print "taking joystick commands"
     """ Get Steering """
-    print "check left button"
-    print self.joystick.get_button( 6 )
-
-
     if self.joystick.get_button( 6 ):  #left
       self.steering_direction = -1
       print "left"
     elif self.joystick.get_button( 7 ): #right
       self.steering_direction = 1
+      print "right"
     else:
       self.steering_direction = 0     #when left or right button is not pressed, bring the steering to centre
 
     
     if( self.joystick.get_button(3)):  #increase speed
+      print "inc speed"
       end_time = datetime.datetime.now()
       time_diff = (end_time - start_time).microseconds / 1000   #in milliseconds
       if time_diff > 300: #to ensure same click isnt counted multiple times
@@ -133,6 +129,7 @@ class ElektraHuman(Driver):
         start_time = datetime.datetime.now()
     
     if( self.joystick.get_button(0)):  #decrease speed
+      print "dec speed"
       end_time = datetime.datetime.now()
       time_diff = (end_time - start_time).microseconds / 1000
       if time_diff > 300:
@@ -140,11 +137,14 @@ class ElektraHuman(Driver):
         self._new_speed = max(0, self._new_speed)
         start_time = datetime.datetime.now()
 
-
     if( self.joystick.get_button( 10 )):
       self._rear =True
     if( self.joystick.get_button( 9 )):
       self._rear=False
+
+
+    print "new speed:", self._new_speed
+    print "direction:", self.steering_direction
 
 
     control = Control()
@@ -168,6 +168,7 @@ class ElektraHuman(Driver):
     # Take the actual image we want to keep
     retval, frame = camera.read()  # Captures a single image from the camera in PIL format
 
+    #print retval
     r=frame.shape[0]
     c=frame.shape[1]
     frame = frame[1:r, 1:c/2] #just take the left camera image
@@ -183,20 +184,33 @@ class ElektraHuman(Driver):
 
 
 
-    # get all the measurements the car is making.
-
-    
-
+    # get all the measurements the car is making
 
     return frame
 
 
+
   
-  def act(self,control):
-  # Send the action to the raspy
+  def act(self,control):		  # Send the action to the raspy
+
+    #sending direction to pi
+    if self.steering_direction == 0:
+        MESSAGE = 'x';	
+        print MESSAGE								
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    elif self.steering_direction == 1:
+        MESSAGE = 'd';	
+        print MESSAGE								
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    elif self.steering_direction == -1:
+        MESSAGE = 'a';	
+        print MESSAGE								
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+
     
+    #sending the speed
     #you may have to define self._new_speed and self._old_speed in class definition
-    change=(self._new_speed-self._old_speed)/10   ##********10 wont work!!!********
+    change= int((self._new_speed-self._old_speed)/0.7)
   
     if(change<0):
       print "Control for decrease"
@@ -206,8 +220,7 @@ class ElektraHuman(Driver):
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
       MESSAGE = 'w'
       print MESSAGE
-      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))        
-  
+      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))          
   
     else: 
       print "Control for increase"    
@@ -218,4 +231,3 @@ class ElektraHuman(Driver):
       MESSAGE = 'w'
       print MESSAGE
       sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-

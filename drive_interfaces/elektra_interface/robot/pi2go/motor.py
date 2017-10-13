@@ -54,52 +54,50 @@ def readkey(getchar_fn=None):
 # End of the functions that read your keyboard
 
 speed = 0
-roll = 60
+roll = 100
 pi2go.init()
 
 # Main body of code - this detects your key press and changes direction depending on it
 try:
     while True:
-        #keyp = readkey()
-        keyp, addr = sock.recvfrom(1024)
+        keyp = readkey()	#uncomment to receive command from keyboard
+        #keyp, addr = sock.recvfrom(1024)	#uncomment to receive command from algo.
         print "received"
-        if keyp == 'w' or keyp == UP:   #move ahead with the set speed
+        if keyp == 'w' or keyp == UP:
             pi2go.forward(speed)
             print 'Forward', speed
-        elif keyp == 's' or keyp == DOWN:  #move back
+        elif keyp == 's' or keyp == DOWN:
             pi2go.reverse(speed)
             print 'Backward', speed
 
-        elif keyp == 'd' or keyp == RIGHT:  #turn right
+        elif keyp == 'd' or keyp == RIGHT:
             pi2go.spinRight(speed, roll)
-            print 'Spin Right', speed
-            print 'turnspeed', roll
+            print 'Spin Right', roll
+            print 'turnspeed', speed
             turnflag = 'r'
-        elif keyp == 'a' or keyp == LEFT:   #turn left
+        elif keyp == 'a' or keyp == LEFT:
             pi2go.spinLeft(speed, roll)
-            print 'Spin Left', speed
-            print 'turnspeed',  roll
+            print 'Spin Left', roll
+            print 'turnspeed',  speed
             turnflag = 'l'
-        elif keyp == '.' or keyp == '>':    #increase speed
+        elif keyp == '.' or keyp == '>':
             speed = min(100, speed+10)
             print 'Speed+', speed
-        elif keyp == ',' or keyp == '<':       #decrease speed
+        elif keyp == ',' or keyp == '<':
             speed = max (0, speed-10)
             print 'Speed-', speed
 
 
-        elif keyp == 'x':       #brings wheel to centre
+        elif keyp == 'x':
     		if turnflag == 'l':				#Wheel at left
 			pi2go.spinRight(speed, roll)
-                        # sleep for 1.1s
-                        time.sleep(0.9)
+                        time.sleep(0.21)		#0.9 for road, 0.21 when in air
                         pi2go.forward(speed)
                         turnflag = 's'
 
-        elif turnflag == 'r':				#Wheel at right
+                elif turnflag == 'r':				#Wheel at right
 			pi2go.spinLeft(speed, roll)
-                        # sleep for 1s
-                        time.sleep(0.9)
+                        time.sleep(0.21)		#0.9 for road, 0.21 when in air
                         pi2go.forward(speed)
                         turnflag = 's'
 

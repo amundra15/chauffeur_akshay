@@ -38,6 +38,7 @@ import time
 from drawing_tools import *
 from extra import *
 
+pygame.init()
 clock = pygame.time.Clock()
 def frame2numpy(frame, frameSize):
 	return np.resize(np.fromstring(frame, dtype='uint8'), (frameSize[1], frameSize[0], 3))
@@ -125,13 +126,15 @@ def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
 	try:
 		while direction != -1:
 			capture_time  = time.time()
-			images = driver.get_sensor_data() # Later it would return more image like [rewards,images,segmentation]
+			images = driver.get_sensor_data()
 			#print 'fps',1.0/(time.time() - capture_time)
 			#sensor_data = frame2numpy(image,[800,600])
+
 
 			for event in pygame.event.get(): # User did something
 				if event.type == pygame.QUIT: # If user clicked close
 					done=True # Flag that we are done so we exit this loop
+
 
 
 			recording = driver.get_recording()		#just booleans, received from joystick
@@ -143,12 +146,11 @@ def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
 			#action_noisy,drifting_time,will_drift = noiser.compute_noise(action[drive_config.middle_camera])
 			action_noisy,drifting_time,will_drift = noiser.compute_noise(action)
 			
-			#print action
-			if recording:	
-				print "Recording"			
-				recorder.record(images,rewards,action,action_noisy)
 
-			#print "RECORDING ? ",recording and not exist_noise
+			if recording:
+				print "RECORDING"
+				recorder.record(images,action.speed,action.steer,action_noisy.steer)
+				#recorder.record(images,action,action_noisy)
 
 
 			#####TODO: implement this for elektra

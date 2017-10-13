@@ -24,7 +24,7 @@ class Recorder(object):
 	# We assume a three camera case not many cameras per input ....
 
 
-	def __init__(self,file_prefix,image_size2,image_size1,current_file_number=0,record_image=True,number_of_images=3,image_cut=[0,240]):
+	def __init__(self,file_prefix,image_size2,image_size1,current_file_number=0,record_image=True,number_of_images=1,image_cut=[65,265]):
 
 		self._number_of_images = number_of_images
 		self._record_image_hdf5 = True
@@ -41,7 +41,7 @@ class Recorder(object):
 
 
 		# TODO SET THE NUMBER OF REWARDS + ACTIONS
-		self._number_rewards = 51
+		self._number_rewards = 15
 		self._num_cams = 1
 
 		if not os.path.exists(self._file_prefix):
@@ -78,17 +78,19 @@ class Recorder(object):
 
 	# TODO: Add some timestamp
 	def record(self,images,speed,steer,steer_noise):
+	#def record(self,images,action,action_noise):
 
 
 		self._data_queue.put([images,speed,steer,steer_noise])
+		#self._data_queue.put([images,action,action_noise])
 
 	@threaded
 	def run_disk_writer(self):
 
 		while True:
 			data = self._data_queue.get()
-			if self._data_queue.qsize() % 100 == 0:
-				print "QSIZE:",self._data_queue.qsize()
+			'''if self._data_queue.qsize() % 100 == 0:
+				print "QSIZE:",self._data_queue.qsize()'''
 			self._write_to_disk(data)
 
 	def _write_to_disk(self,data):
@@ -113,11 +115,13 @@ class Recorder(object):
 			
 			#print int(round(time.time() * 1000))
 			if self._record_image:
-				im = Image.fromarray(images[i])
+				#im = Image.fromarray(images[i])
+				im = Image.fromarray(images)
 				im.save(self._images_writing_folder_vec[i] + str((capture_time)) + ".jpg")
 
 			if self._record_image_hdf5:
-				image = images[i][self._image_cut[0]:self._image_cut[1],:,:]
+				#image = images[i][self._image_cut[0]:self._image_cut[1],:,:]
+				image = images[self._image_cut[0]:self._image_cut[1],:,:]
 				#print images[i].shape
 				#print self._image_cut
 				image = scipy.misc.imresize(image,[self._image_size2,self._image_size1])
@@ -126,7 +130,7 @@ class Recorder(object):
 			self.data_rewards[pos,0]  = steer
 
 			self.data_rewards[pos,5]  = steer_noise
-			self.data_rewards[pos,5]  = speed  
+			self.data_rewards[pos,10]  = speed  
        
        
 
