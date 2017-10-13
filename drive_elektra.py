@@ -140,7 +140,7 @@ def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
 			recording = driver.get_recording()		#just booleans, received from joystick
 			driver.get_reset()			#just booleans, received from joystick
 
-			action,new_speed = driver.compute_action(images[drive_config.middle_camera],old_speed) #rewards.speed
+			action,new_speed = driver.compute_action(images,old_speed) #rewards.speed
 
 
 			#action_noisy,drifting_time,will_drift = noiser.compute_noise(action[drive_config.middle_camera])
