@@ -22,7 +22,7 @@ ramp_frames = 15  #Number of frames to throw away while the camera adjusts to li
 #rval = True
 
 UDP_IP = "10.42.0.144"
-UDP_PORT = 5007
+UDP_PORT = 5009
 sock = socket.socket(socket.AF_INET, # Internet
           socket.SOCK_DGRAM) # UDP
 
@@ -51,6 +51,8 @@ class ElektraHuman(Driver):
     self._rear = False
     self.steering_direction = 0
     self._new_speed = 0
+    self.hold = True
+    self.resume = False
 
 
 
@@ -74,8 +76,8 @@ class ElektraHuman(Driver):
     if joystick_count >1:
       print "Please Connect Just One Joystick"
       raise 
-    #print "joystick count:"
-    #print joystick_count
+    print "joystick count:"
+    print joystick_count
     self.joystick = pygame.joystick.Joystick(0)
     self.joystick.init()
     #print self.joystick.get_numbuttons()
@@ -104,6 +106,7 @@ class ElektraHuman(Driver):
 
   def compute_action(self,sensor,speed):
 
+
     self._old_speed = speed
     global start_time
 
@@ -119,6 +122,7 @@ class ElektraHuman(Driver):
       self.steering_direction = 0     #when left or right button is not pressed, bring the steering to centre
 
     
+    '''#commenting cos we are no longer controlling speed
     if( self.joystick.get_button(3)):  #increase speed
       print "inc speed"
       end_time = datetime.datetime.now()
@@ -135,7 +139,20 @@ class ElektraHuman(Driver):
       if time_diff > 300:
         self._new_speed = self._old_speed - 0.7
         self._new_speed = max(0, self._new_speed)
-        start_time = datetime.datetime.now()
+        start_time = datetime.datetime.now()'''
+
+
+    if( self.joystick.get_button(0)):  #decrease speed to zero
+      self.hold = True
+    else:
+      self.hold = False
+
+    if( self.joystick.get_button(3)):  #increase speed to max
+      self.resume = True
+    else:
+      self.resume = False
+    #Note: keeping 2 diff variables for hold and resume sends signal only when a button is pressed and not always
+
 
     if( self.joystick.get_button( 10 )):
       self._rear =True
@@ -207,12 +224,21 @@ class ElektraHuman(Driver):
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
-    #no longer sending the speed as we train only for steering control. NOTE: uncommenting this code creates a problem that steer cant be handled with controller.
-    #sending the speed
-    #you may have to define self._new_speed and self._old_speed in class definition
-    '''change= int((self._new_speed-self._old_speed)/0.7)
+
+    #sending on/off to pi
+    if self.hold == True:
+        MESSAGE = 'h';	#hold
+        print MESSAGE								
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    if self.resume == True:
+        MESSAGE = 'r';	#resume
+        print MESSAGE								
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+
+
+    #no longer controlling the speed as we train only for steering control. NOTE: uncommenting this code creates a problem that steer cant be handled with controller.
   
-    if(change<0):
+    '''if(change<0):
       print "Control for decrease"
       for k in range(abs(change)):    
         MESSAGE = '<'

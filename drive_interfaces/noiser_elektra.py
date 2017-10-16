@@ -234,7 +234,7 @@ class Noiser(object):
 				noisy_action = Control()
 				noisy_action.steer = steer_noisy
 				noisy_action.speed = action.speed 
-				print noisy_action.steer, noisy_action.speed
+				print 'Steer:', noisy_action.steer, '	Speed:', noisy_action.speed
 				#print 'timefornosie'
 				return noisy_action,False,not self.remove_noise
 				

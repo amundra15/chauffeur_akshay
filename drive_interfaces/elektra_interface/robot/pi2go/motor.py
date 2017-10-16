@@ -23,7 +23,7 @@ LEFT = 3
 turnflag = 's'
 
 UDP_IP = "10.42.0.144"
-UDP_PORT = 5007
+UDP_PORT = 5009
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
@@ -53,7 +53,7 @@ def readkey(getchar_fn=None):
 
 # End of the functions that read your keyboard
 
-speed = 100 #fixing speed to maximum as we dont wqant to train on speed. thus you can only start and stop the car
+speed = 0 #start with zero speed
 roll = 100 #to discretize turn.
 pi2go.init()
 
@@ -62,7 +62,8 @@ try:
     while True:
         #keyp = readkey()	#uncomment to receive command from keyboard
         keyp, addr = sock.recvfrom(1024)	#uncomment to receive command from algo.
-        print "received"
+        #print "received"
+
         if keyp == 'w' or keyp == UP:			#wont be used
             pi2go.forward(speed)
             print 'Forward', speed
@@ -76,14 +77,25 @@ try:
             print 'Spin Right', roll
             print 'turnspeed', speed
             turnflag = 'r'
-            print 'turnflag' , turnflag
+            #print 'turnflag' , turnflag
         elif keyp == 'a' or keyp == LEFT:
             pi2go.spinLeft(speed, roll)
             #pi2go.forward(speed)
             print 'Spin Left', roll
             print 'turnspeed',  speed
             turnflag = 'l'
-            print 'turnflag' , turnflag
+            #print 'turnflag' , turnflag
+
+        elif keyp == 'h': 
+            speed = 0
+            pi2go.forward(speed)
+            print 'Car stopped'
+        elif keyp == 'r':
+            speed = 40
+            pi2go.forward(speed)
+            print 'Car resumed'
+
+
         elif keyp == '.' or keyp == '>':		#wont be used
             speed = min(100, speed+10)
             print 'Speed+', speed
@@ -94,12 +106,14 @@ try:
 
         elif keyp == 'x':
     		if turnflag == 'l':				#Wheel at left
+			print 'Spin right to centre'
 			pi2go.spinRight(speed, roll)
                         time.sleep(0.21)		#0.9 for road, 0.21 when in air
                         pi2go.forward(speed)
                         turnflag = 's'
 
                 elif turnflag == 'r':				#Wheel at right
+			print 'Spin left to centre'
 			pi2go.spinLeft(speed, roll)
                         time.sleep(0.21)		#0.9 for road, 0.21 when in air
                         pi2go.forward(speed)
