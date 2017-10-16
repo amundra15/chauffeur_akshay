@@ -1,28 +1,10 @@
 
 import numpy as np
 import cv2
-import mavros_msgs as msgs
+
 import scipy
-#/mavros/rc/override - Override RC inputs
-from mavros_msgs.msg import OverrideRCIn
-
-#/mavros/set_stream_rate - Send stream rate request to FCU
-from mavros_msgs.srv import StreamRate 
-
-#/mavros/set_mode - Set FCU operation mode (http://wiki.ros.org/mavros/CustomModes) 
-from mavros_msgs.srv import SetMode
 
 
-#/mavros/global_position/gp_vel - Velocity fused by FCU
-#/mavros/global_position/raw/gps_vel - Velocity output from the GPS device
-#/mavros/local_position/velocity - Velocity data from FCU
-from geometry_msgs.msg import TwistStamped
-from geometry_msgs.msg import Twist
-from geometry_msgs.msg import Vector3
-
-#/mavros/global_position/rel_alt - Relative altitude
-#/mavros/global_position/compass_hdg - Compass heading in degrees
-from std_msgs.msg import Float64
 import math
 import copy
 from driver import *
@@ -31,9 +13,10 @@ import tensorflow as tf
 from training_manager import TrainManager
 import machine_output_functions
 import os
-from deeprc_callbacks import *
+
 import time
 
+import socket
 
 from drawing_tools import *
 print(cv2.__version__)
@@ -43,7 +26,9 @@ class Control:
     speed = 0
     steer = 0
 
+
 camera_port = 1   # Change this to your webcam ID, or file name for your video file
+
 ramp_frames = 15  #Number of frames to throw away while the camera adjusts to light levels
 
 UDP_IP = "10.42.0.144"
@@ -85,13 +70,15 @@ def load_system(config):
 
   return training_manager
 
-class ElektraHuman(Driver):
+
+class ElektraMachine(Driver):
 
 
 
   # Initializes
-  def __init__(self,gpu_number,experiment_name,driver_conf,memory_fraction=0.95):
-    
+
+  def __init__(self,gpu_number,experiment_name,drive_conf,memory_fraction=0.95):
+
     Driver.__init__(self)
     self._augment_left_right = drive_conf.augment_left_right
  
@@ -102,8 +89,9 @@ class ElektraHuman(Driver):
     self.steering_direction = 0
     self._new_speed = 0
 
-    self._resolution = driver_conf.resolution
-    self._image_cut = driver_conf.image_cut
+
+    self._resolution = drive_conf.resolution
+    self._image_cut = drive_conf.image_cut
 
 
     conf_module  = __import__(experiment_name)
@@ -116,7 +104,9 @@ class ElektraHuman(Driver):
     self._sess = tf.Session(config=config_gpu)
    
 
-    self._mean_image = np.load('data_stats/'+ self._config.dataset_name + '_meanimage.npy')
+    self._mean_image = np.load(self._config.save_data_stats + '/meanimage.npy')
+    #self._mean_image = np.load('data_stats/'+ self._config.dataset_name + '_meanimage.npy')
+
     self._train_manager =  load_system(conf_module.configTrain())
 
 
@@ -131,6 +121,7 @@ class ElektraHuman(Driver):
 
   def start(self):
     #manually run motor.py
+    pass
 
 
 
@@ -138,11 +129,9 @@ class ElektraHuman(Driver):
     return True
 
 
-  '''def get_reset(self):
-    if self.callbacks.rcIn[self.ch_stop] < 1500:
-      return False
-    else:
-      return True'''
+
+  def get_reset(self):
+    return False
 
   def get_direction(self):
     return 2.0
