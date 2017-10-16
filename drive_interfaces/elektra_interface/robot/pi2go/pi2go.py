@@ -303,6 +303,7 @@ def reverse(speed):
 
 # spinLeft(speed): Sets motors to turn opposite directions at speed. 0 <= speed <= 100
 def spinLeft(speed, roll):
+    #print "in spinleft"
     p.ChangeDutyCycle(100)
     q.ChangeDutyCycle(0)
     a.ChangeDutyCycle(speed)
@@ -318,6 +319,7 @@ def spinLeft(speed, roll):
 
 # spinRight(speed): Sets motors to turn opposite directions at speed. 0 <= speed <= 100
 def spinRight(speed, roll):
+    #print "in spinright"
     p.ChangeDutyCycle(100)
     q.ChangeDutyCycle(0)
     a.ChangeDutyCycle(speed)

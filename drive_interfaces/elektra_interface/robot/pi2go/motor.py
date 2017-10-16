@@ -23,7 +23,7 @@ LEFT = 3
 turnflag = 's'
 
 UDP_IP = "10.42.0.144"
-UDP_PORT = 5050
+UDP_PORT = 5007
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
@@ -53,37 +53,41 @@ def readkey(getchar_fn=None):
 
 # End of the functions that read your keyboard
 
-speed = 0
-roll = 100
+speed = 100 #fixing speed to maximum as we dont wqant to train on speed. thus you can only start and stop the car
+roll = 100 #to discretize turn.
 pi2go.init()
 
 # Main body of code - this detects your key press and changes direction depending on it
 try:
     while True:
-        keyp = readkey()	#uncomment to receive command from keyboard
-        #keyp, addr = sock.recvfrom(1024)	#uncomment to receive command from algo.
+        #keyp = readkey()	#uncomment to receive command from keyboard
+        keyp, addr = sock.recvfrom(1024)	#uncomment to receive command from algo.
         print "received"
-        if keyp == 'w' or keyp == UP:
+        if keyp == 'w' or keyp == UP:			#wont be used
             pi2go.forward(speed)
             print 'Forward', speed
-        elif keyp == 's' or keyp == DOWN:
+        elif keyp == 's' or keyp == DOWN:		#wont be used
             pi2go.reverse(speed)
             print 'Backward', speed
 
         elif keyp == 'd' or keyp == RIGHT:
             pi2go.spinRight(speed, roll)
+            #pi2go.forward(speed)
             print 'Spin Right', roll
             print 'turnspeed', speed
             turnflag = 'r'
+            print 'turnflag' , turnflag
         elif keyp == 'a' or keyp == LEFT:
             pi2go.spinLeft(speed, roll)
+            #pi2go.forward(speed)
             print 'Spin Left', roll
             print 'turnspeed',  speed
             turnflag = 'l'
-        elif keyp == '.' or keyp == '>':
+            print 'turnflag' , turnflag
+        elif keyp == '.' or keyp == '>':		#wont be used
             speed = min(100, speed+10)
             print 'Speed+', speed
-        elif keyp == ',' or keyp == '<':
+        elif keyp == ',' or keyp == '<':		#wont be used
             speed = max (0, speed-10)
             print 'Speed-', speed
 

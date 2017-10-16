@@ -207,10 +207,10 @@ class ElektraHuman(Driver):
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
-    
+    #no longer sending the speed as we train only for steering control. NOTE: uncommenting this code creates a problem that steer cant be handled with controller.
     #sending the speed
     #you may have to define self._new_speed and self._old_speed in class definition
-    change= int((self._new_speed-self._old_speed)/0.7)
+    '''change= int((self._new_speed-self._old_speed)/0.7)
   
     if(change<0):
       print "Control for decrease"
@@ -230,4 +230,4 @@ class ElektraHuman(Driver):
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
       MESSAGE = 'w'
       print MESSAGE
-      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))'''
