@@ -194,15 +194,15 @@ class ElektraHuman(Driver):
   def act(self,control):		  # Send the action to the raspy
 
     #sending direction to pi
-    if self.steering_direction == 0:
+    if control.steer == 0:
         MESSAGE = 'x';	
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    elif self.steering_direction == 1:
+    elif control.steer == 1:
         MESSAGE = 'd';	
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    elif self.steering_direction == -1:
+    elif control.steer == -1:
         MESSAGE = 'a';	
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))

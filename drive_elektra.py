@@ -22,7 +22,7 @@ sys.path.append('evaluation')
 
 import math
 import argparse
-from noiser import Noiser
+from noiser_elektra import Noiser
 
 import datetime
 
