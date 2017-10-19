@@ -64,7 +64,7 @@ class configMain:
 		#self.dropout = [0.8]*8 + [0.5]*2 + [0.5]*2 + [0.5]*1 + [0.5, 1.]*7
 		self.dropout = [0.8]*4 + [0.5]*1 + [0.5]*1 
 
-		self.restore = True # This is if you want to restore a saved model
+		self.restore = False # This is if you want to restore a saved model
 
 		self.models_path = os.path.join('models', os.path.basename(__file__).split('.')[0])
 		self.train_path_write = os.path.join(self.models_path, 'train')
@@ -109,12 +109,12 @@ class configInput(configMain):
 
 		# there are files with data, 200 images each, and here we select which ones to use
 
-		self.save_data_stats = 'data_stats' # the 'data_stats/path' file points to the location of the data
+		#self.save_data_stats = 'data_stats' # the 'data_stats/path' file points to the location of the data
 
 		#with open(os.path.join(self.save_data_stats, 'path'),'r') as f:
 		#	path = f.read().strip()
 
-		path = '../AkshayData4'
+		path = '../tempdata'
 		
 		train_path = os.path.join(path, 'SeqTrain')
 		val_path = os.path.join(path, 'SeqVal')

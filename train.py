@@ -123,38 +123,6 @@ def train(gpu_number, experiment_name):
       save_model(saver,sess,config.models_path,i)
 
 
-
-    '''if i == 0: 
-      
-      network_outputs_split =tf.split(training_manager._output_network[0],training_manager._output_network[0].get_shape()[1],1 )
-      for j in range(len(2)):
-        target_name = branches_configuration[i][j] # name of the target
-
-      target_gt = ground_truths[config.targets_names.index(target_name)]
-      print 'target_gt: '
-
-      if target_name == 'Steer': 
-      # Save to file
-      np.save(filename, target_gt )'''
-
-    '''if i == 1: 
-      
-      network_outputs_split =tf.split(training_manager._output_network[0],training_manager._output_network[0].get_shape()[1],1 )
-      branches_configuration = config.branch_config
-      
-      target_name = branches_configuration[0][0] # name of the target is steer, when running ak02_ca24_steer
-      
-      ground_truths = training_manager._targets_data
-      target_gt = ground_truths[config.targets_names.index(target_name)]
-      print target_gt
-      print tf.Session().run(target_gt)
-
-      if target_name == 'Steer': 
-        # Save to file
-        print 'saving steer values'
-        np.savetxt('data_stats' +'/' +'batch_steer.npy',tf.Session().run(target_gt))'''
-
-
     training_manager.run_train_step(batch_tensor,sess,i)
     #   #print "RUNNED STEP"
 

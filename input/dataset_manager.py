@@ -84,7 +84,7 @@ class DatasetManager(object):
     #self._splited_keys_train = self.divide_keys_by_labels(control_train,self._splited_keys_train,config.number_of_divisions,config.labels_per_division)
 
 
-    print config.save_data_stats +'/' + 'meanimage.npy'
+    '''print config.save_data_stats +'/' + 'meanimage.npy'
     if not os.path.isfile(config.save_data_stats +'/'+ 'meanimage.npy'):
       print 'Compute mean'
       mean_image = self.compute_average_number(self._images_train,self._splited_keys_train,config.image_size)
@@ -94,7 +94,7 @@ class DatasetManager(object):
       data = np.load(config.save_data_stats +'/' + 'meanimage.npy')
       
       mean_image = data
-      del data
+      del data'''
 
 
     print max(max(max(self._splited_keys_train)))
@@ -167,7 +167,7 @@ class DatasetManager(object):
           print count
           dset = h5py.File(cword, "r")  
 
-          x = dset["images_center"]
+          x = dset["images_center"]          
           old_shape = x.shape[0]
 
 

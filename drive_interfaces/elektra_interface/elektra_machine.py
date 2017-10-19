@@ -104,7 +104,7 @@ class ElektraMachine(Driver):
     self._sess = tf.Session(config=config_gpu)
    
 
-    self._mean_image = np.load(self._config.save_data_stats + '/meanimage.npy')
+    #self._mean_image = np.load(self._config.save_data_stats + '/meanimage.npy')  #no longer used
     #self._mean_image = np.load('data_stats/'+ self._config.dataset_name + '_meanimage.npy')
 
     self._train_manager =  load_system(conf_module.configTrain())
@@ -156,7 +156,7 @@ class ElektraMachine(Driver):
 
     #print future_image
 
-    image_input = image_input - self._mean_image
+    #image_input = image_input - self._mean_image
     #print "2"
     image_input = np.multiply(image_input, 1.0 / 127.0)
 

@@ -92,7 +92,7 @@ class CarlaMachine(Runnable,Driver):
     self._left_button = False
     self._right_button = False
     self._recording= False
-    self._mean_image = np.load(self._config.save_data_stats + '/meanimage.npy')
+    #self._mean_image = np.load(self._config.save_data_stats + '/meanimage.npy') #no longer used
     self._train_manager =  load_system(conf_module.configTrain())
 
 
@@ -204,7 +204,7 @@ class CarlaMachine(Runnable,Driver):
 
     #print future_image
 
-    image_input = image_input - self._mean_image
+    #image_input = image_input - self._mean_image
     #print "2"
     image_input = np.multiply(image_input, 1.0 / 127.0)
 
@@ -245,7 +245,7 @@ class CarlaMachine(Runnable,Driver):
 
     #print future_image
 
-    image_input = image_input - self._mean_image
+    #image_input = image_input - self._mean_image
     #print "2"
     image_input = np.multiply(image_input, 1.0 / 127.0)
 
@@ -303,7 +303,7 @@ class CarlaMachine(Runnable,Driver):
 
     #print future_image
 
-    image_input = image_input - self._mean_image
+    #image_input = image_input - self._mean_image
     #print "2"
     image_input = np.multiply(image_input, 1.0 / 127.0)
 

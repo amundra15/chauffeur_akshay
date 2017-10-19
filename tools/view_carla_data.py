@@ -37,6 +37,7 @@ class Control:
     hand_brake = 0
     reverse = 0
 
+
 #gta_surface = get_gta_map_surface()
 
 
@@ -171,7 +172,7 @@ class Control:
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Path viewer')
   #parser.add_argument('model', type=str, help='Path to model definition json. Model weights should be on the same path.')
-  parser.add_argument('--dataset', type=str, default="AkshayData3_video", help='Dataset/video clip name')
+  parser.add_argument('--dataset', type=str, default="ElektraData1_video", help='Dataset/video clip name')
   args = parser.parse_args()
 
 
@@ -184,14 +185,14 @@ if __name__ == "__main__":
   steering_pred =[]
   steering_gt =[]
 
-  positions_to_test =  range(1,141) #total hdf5 files
+  positions_to_test =  range(0,3) #total hdf5 files
   #positions_to_test = [93,104,170,173,229,245,283,397,413,425,565,581,591]
   #positions_to_test = range(0,660)
   #positions_to_test = [617,618,619,620,622,623,624,636,637,638,639]
   #positions_to_test =  [637,638]
   #positions_to_test = [55,108,109,353,410,411,426,441,442]
   #positions_to_test = [656,657,675,676,854,855,859,860,861,902]
-  path = '../AkshayData3/SeqTrain/'
+  path = '../ElektraData1/SeqTrain/'
 
 
   screen = ScreenManager()
@@ -199,12 +200,14 @@ if __name__ == "__main__":
   image_queue = deque()
 
   speed_list = []
+  steer_list = []
+  noisy_steer_list = []
 
   actions_queue = deque()
 
   '''#for 3 augmented images
   screen.start_screen([200,88],3,4)'''
-  screen.start_screen([200,88],1,4)
+  screen.start_screen([200,88],1,2) 
 
   '''#for 3 augmented images
   images= [np.array([200,88,3]),np.array([200,88,3]),np.array([200,88,3])]
@@ -224,7 +227,7 @@ if __name__ == "__main__":
     
 
     # skip to highway
-    for i in range(0,198,12):   #every hdf5 files containg data for 200 images
+    for i in range(0,198,4):   #every hdf5 files containg data for 200 images
 
 
       #img = cam['X'][log['cam1_ptr'][i]].swapaxes(0,2).swapaxes(0,1)
@@ -234,6 +237,7 @@ if __name__ == "__main__":
 
       actions.steer = data['targets'][i][0]
       actions.gas = data['targets'][i][1]
+      noisy_steer = data['targets'][i][5]
 
 
       speed = data['targets'][i][10]
@@ -246,7 +250,8 @@ if __name__ == "__main__":
       
       time.sleep(0.5) #to slow video down
 
-      speed_list.append((actions.steer))
+      steer_list.append((actions.steer))
+      noisy_steer_list.append((noisy_steer))
       #speed_list.append(speed)
 
       #reimg = np.array(redata['images_center'][i])
@@ -255,7 +260,8 @@ if __name__ == "__main__":
       #img = img*255
       #print img
 
-  plt.plot(range(0,len(speed_list)),speed_list)
+  plt.plot(range(0,len(steer_list)),steer_list,'r')
+  plt.plot(range(0,len(noisy_steer_list)),noisy_steer_list)
   
   plt.show()
   #save_gta_surface(gta_surface)

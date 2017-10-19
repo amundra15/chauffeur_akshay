@@ -116,6 +116,12 @@ class  ScreenManager(object):
 
 		position = (0,0)
 
+		'''print array.shape[0]
+		print self._resolution[1]
+		print array.shape[1]
+		print self._resolution[0]'''
+
+
 		if array.shape[0] != self._resolution[1] or array.shape[1] != self._resolution[0]: 
 
 			array = scipy.misc.imresize(array,[self._resolution[1],self._resolution[0]])
@@ -232,8 +238,10 @@ class  ScreenManager(object):
 		#a = sensor_data.shape
 		#print a
 		#print len(a)
-		#no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
-		size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why changed from above to this suddenly!
+		no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
+		sensor_data = sensor_data[0]
+		#size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
+		#Note: Depending upon the above two, include or not line 242
 
 
 
