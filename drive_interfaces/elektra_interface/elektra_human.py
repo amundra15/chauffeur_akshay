@@ -18,7 +18,7 @@ import logging
 import socket
 
 camera_port = 1   # Change this to your webcam ID, or file name for your video file
-ramp_frames = 40  #Number of frames to throw away while the camera adjusts to light levels
+ramp_frames = 70  #Number of frames to throw away while the camera adjusts to light levels
 #rval = True
 
 UDP_IP = "10.42.0.144"
