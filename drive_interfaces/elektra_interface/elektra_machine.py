@@ -181,7 +181,7 @@ class ElektraMachine(Driver):
       return [control,control,control]
 
     else:
-      return [control]
+      return [control],_new_speed
 
 
   def get_sensor_data(self):
