@@ -167,8 +167,8 @@ class ElektraMachine(Driver):
 
 
     control = Control()
-    control.speed = self._new_speed
-    control.steer = self.steer
+    control.speed = _new_speed
+    control.steer = steer
 
     if self._augment_left_right: # If augment data, we generate copies of steering for left and right
       control_left = copy.deepcopy(control)
@@ -181,7 +181,7 @@ class ElektraMachine(Driver):
       return [control,control,control]
 
     else:
-      return [control]
+      return control, _new_speed
 
 
   def get_sensor_data(self):
