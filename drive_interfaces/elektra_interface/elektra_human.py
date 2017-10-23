@@ -3,8 +3,7 @@ import cv2
 #import mavros_msgs as msgs
 
 import pygame
-
-import subprocess
+#import getch
 
 import datetime
 start_time = datetime.datetime.now()
@@ -17,8 +16,8 @@ import logging
 
 import socket
 
-camera_port = 1   # Change this to your webcam ID, or file name for your video file
-ramp_frames = 70  #Number of frames to throw away while the camera adjusts to light levels
+camera_port = 0   # Change this to your webcam ID, or file name for your video file
+ramp_frames = 30  #Number of frames to throw away while the camera adjusts to light levels
 #rval = True
 
 UDP_IP = "10.42.0.144"
@@ -52,7 +51,8 @@ class ElektraHuman(Driver):
     self.steering_direction = 0
     self._new_speed = 0
     self.hold = True
-    self.resume = False
+    #self.resume = False
+    #self.camera
 
 
 
@@ -67,11 +67,20 @@ class ElektraHuman(Driver):
     print "end"	 '''
 
     # Starts communication with the cameras
+    self.camera = cv2.VideoCapture(camera_port)
+ 
+    # Ramp the camera - these frames will be discarded and are only used to allow v4l2 to adjust light levels, if necessary
+    print("Adjusting brightness...")
+    for i in xrange(ramp_frames):
+      retval, temp = self.camera.read()
+      #print retval
+    print "START DRIVING"
+    
     
     # Start any background process... etc.
 
     # Start the interface with the joystick 
-    pygame.joystick.init()
+    '''pygame.joystick.init()
     joystick_count = pygame.joystick.get_count()
     if joystick_count >1:
       print "Please Connect Just One Joystick"
@@ -79,17 +88,39 @@ class ElektraHuman(Driver):
     print "joystick count:"
     print joystick_count
     self.joystick = pygame.joystick.Joystick(0)
-    self.joystick.init()
+    self.joystick.init()'''
     #print self.joystick.get_numbuttons()
+    
 
+    #initialize pygame for keyboard
+    pygame.init()
+    #clock = pygame.time.Clock()
+    screen = pygame.display.set_mode((100,100))
+    event=pygame.event.poll()
+
+    
+
+
+
+ 
 
   def get_recording(self):
     # Joystick command to activate and deactivate record
-    if( self.joystick.get_button( 2 )):
+
+    '''if( self.joystick.get_button( 2 )):
       self._recording =True
     if( self.joystick.get_button( 1 )):
+      self._recording=False'''
+
+    
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_r]:
+      self._recording =True
+    if keys[pygame.K_t]:
       self._recording=False
+
     return self._recording
+
 
 
   def get_reset(self):
@@ -112,16 +143,30 @@ class ElektraHuman(Driver):
 
     #print "taking joystick commands"
     """ Get Steering """
-    if self.joystick.get_button( 6 ):  #left
+
+    '''if self.joystick.get_button( 6 ):  #left
       self.steering_direction = -1
       print "left"
     elif self.joystick.get_button( 7 ): #right
       self.steering_direction = 1
       print "right"
     else:
-      self.steering_direction = 0     #when left or right button is not pressed, bring the steering to centre
+      self.steering_direction = 0'''     #when left or right button is not pressed, bring the steering to centre
 
-    
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_a]:
+      self.steering_direction = -1
+      #print "left"
+    elif keys[pygame.K_d]:
+      self.steering_direction = 1
+      #print "right"
+    else:
+      self.steering_direction = 0     #when left or right button is not pressed, bring the steering to centre
+      #print "in zero"
+
+
+
+
     '''#commenting cos we are no longer controlling speed
     if( self.joystick.get_button(3)):  #increase speed
       print "inc speed"
@@ -142,22 +187,33 @@ class ElektraHuman(Driver):
         start_time = datetime.datetime.now()'''
 
 
-    if( self.joystick.get_button(0)):  #decrease speed to zero
+
+
+    #keys = pygame.key.get_pressed()
+    if keys[pygame.K_s]:   #decrease speed to zero
       self.hold = True
-    else:
+      print "hold"
+      self._new_speed = 0
+
+
+    #keys = pygame.key.get_pressed()
+    if keys[pygame.K_w]:   #increase speed to max
       self.hold = False
+      print "resume"
+      self._new_speed = 7
 
-    if( self.joystick.get_button(3)):  #increase speed to max
-      self.resume = True
-    else:
-      self.resume = False
-    #Note: keeping 2 diff variables for hold and resume sends signal only when a button is pressed and not always
+    
 
+    #keys = pygame.key.get_pressed()
+    if keys[pygame.K_b]:  
+      self._rear = True
 
-    if( self.joystick.get_button( 10 )):
-      self._rear =True
-    if( self.joystick.get_button( 9 )):
-      self._rear=False
+    #keys = pygame.key.get_pressed()
+    if keys[pygame.K_n]: 
+      self._rear = False
+
+    if self._rear == True:
+      print "Taking Reverse.."
 
 
     print "new speed:", self._new_speed
@@ -174,16 +230,10 @@ class ElektraHuman(Driver):
 
   def get_sensor_data(self):
 
-    # Get the camera image
-    camera = cv2.VideoCapture(camera_port)
- 
-    # Ramp the camera - these frames will be discarded and are only used to allow v4l2 to adjust light levels, if necessary
-    for i in xrange(ramp_frames):
-      retval, temp = camera.read()
-    print("Taking image...")
+
 
     # Take the actual image we want to keep
-    retval, frame = camera.read()  # Captures a single image from the camera in PIL format
+    retval, frame = self.camera.read()  # Captures a single image from the camera in PIL format
 
     #print retval
     r=frame.shape[0]
@@ -197,8 +247,7 @@ class ElektraHuman(Driver):
     cv2.waitKey(0)
     cv2.destroyAllWindows()'''
  
-    del(camera)  # You'll want to release the camera, otherwise you won't be able to create a new capture object until your script exits
-
+  
 
 
     # get all the measurements the car is making
@@ -230,7 +279,8 @@ class ElektraHuman(Driver):
         MESSAGE = 'h';	#hold
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    if self.resume == True:
+    else:
+    #if self.resume == True:
         MESSAGE = 'r';	#resume
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
@@ -257,3 +307,9 @@ class ElektraHuman(Driver):
       MESSAGE = 'w'
       print MESSAGE
       sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))'''
+
+
+
+  def end(self):
+    self.camera.release()
+    pygame.quit()

@@ -47,41 +47,6 @@ def frame2numpy(frame, frameSize):
 # TODO: TURN this into A FACTORY CLASS
 def get_instance(drive_config,experiment_name,drivers_name,memory_use):
 
-	'''if drive_config.interface == "Carla":
-
-		from carla_recorder import Recorder
-
-		if drive_config.type_of_driver == "Human":
-			from carla_human import CarlaHuman
-			driver = CarlaHuman(drive_config)
-		else:
-			from carla_machine import CarlaMachine
-			driver = CarlaMachine("0",experiment_name,drive_config,memory_use)
-
-	elif drive_config.interface == 'GTA':
-		
-		
-		from gta_recorder import Recorder
-		if drive_config.type_of_driver == "Human":
-			from gta_human import GTAHuman
-			driver = GTAHuman()
-		else:
-			from gta_machine import GTAMachine
-			driver = GTAMachine("0",experiment_name)
-
-	elif  drive_config.interface == 'DeepRC':
-
-		from deeprc_recorder import Recorder
-		if drive_config.type_of_driver == "Human":
-			from deeprc_human import DeepRCHuman
-			driver = DeepRCHuman(drive_config)
-		else:
-			from deeprc_machine import DeepRCMachine
-			driver = DeepRCMachine("0",experiment_name,drive_config,memory_use)	
-
-	else:
-		print " Not valid interface is set "'''
-
 	from elektra_recorder import Recorder
 	if drive_config.type_of_driver == "Human":
 		from elektra_human import ElektraHuman
@@ -196,7 +161,7 @@ def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
 		traceback.print_exc()
 
 	finally:
-
+		driver.end()
 		#driver.write_performance_file(path,folder_name,iteration)
 		pygame.quit()
 

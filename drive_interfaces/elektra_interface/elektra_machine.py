@@ -29,7 +29,7 @@ class Control:
 
 camera_port = 1   # Change this to your webcam ID, or file name for your video file
 
-ramp_frames = 15  #Number of frames to throw away while the camera adjusts to light levels
+ramp_frames = 30  #Number of frames to throw away while the camera adjusts to light levels
 
 UDP_IP = "10.42.0.144"
 UDP_PORT = 5007
@@ -121,7 +121,16 @@ class ElektraMachine(Driver):
 
   def start(self):
     #manually run motor.py
-    pass
+
+    # Starts communication with the cameras
+    self.camera = cv2.VideoCapture(camera_port)
+ 
+    # Ramp the camera - these frames will be discarded and are only used to allow v4l2 to adjust light levels, if necessary
+    for i in xrange(ramp_frames):
+      retval, temp = self.camera.read()
+      #print retval
+    print("Adjusting brightness...")
+    
 
 
 
@@ -186,16 +195,9 @@ class ElektraMachine(Driver):
 
 
   def get_sensor_data(self):
-    # Get the camera image
-    camera = cv2.VideoCapture(camera_port)
- 
-    # Ramp the camera - these frames will be discarded and are only used to allow v4l2 to adjust light levels, if necessary
-    for i in xrange(ramp_frames):
-      retval, temp = camera.read()
-    print("Taking image...")
 
     # Take the actual image we want to keep
-    retval, frame = camera.read()  # Captures a single image from the camera in PIL format
+    retval, frame = self.camera.read()  # Captures a single image from the camera in PIL format
 
     #print retval
     r=frame.shape[0]
@@ -208,9 +210,6 @@ class ElektraMachine(Driver):
     '''cv2.imshow('image',frame)
     cv2.waitKey(0)
     cv2.destroyAllWindows()'''
- 
-    del(camera)  # You'll want to release the camera, otherwise you won't be able to create a new capture object until your script exits
-
 
 
     # get all the measurements the car is making
@@ -286,3 +285,8 @@ class ElektraMachine(Driver):
 
     #print vbp_image.shape
     return 0.5*grayscale_colormap(np.squeeze(vbp_image),'jet') + 0.5*image_input'''
+
+
+  def end(self):
+    self.camera.release()
+
