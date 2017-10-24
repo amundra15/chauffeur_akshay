@@ -20,8 +20,16 @@ class TrainManager(object):
 		
 		with tf.device('/gpu:0'):
 			
-			self._input_images = tf.placeholder("float",shape=[None,config.image_size[0],config.image_size[1],config.image_size[2]], name="input_image")	#from configMain in experiment_name.py
+			#self._input_images = tf.placeholder("float",shape=[None,config.image_size[0],config.image_size[1],config.image_size[2]], name="input_image")	#from configMain in experiment_name.py
 
+			self._input_images =[]
+			for i in range(len(self._config.sensor_names)):
+				self._input_images.append(tf.placeholder("float",shape=[None,config.image_size[0],config.image_size[1],\
+					config.image_size[2]], name="input_image"))
+			self._input_images = self._input_images[0]
+
+
+			
 			#self._input_data = []
 			self._targets_data = []
 			for i in range(len(self._config.targets_names)):

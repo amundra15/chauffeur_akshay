@@ -124,8 +124,8 @@ def single_branch(image_input,config,sess,train_manager):
     predicted_steers[i] = int(round(predicted_steers[i]))'''
 
   predicted_steers = int(round(output_all[0][0][0]))
-  #predicted_speed = (output_all[0][0][1])
-  predicted_speed = 7   #fixing speed to max
+  predicted_speed = (output_all[0][0][1])
+  
 
   #predicted_acc = (output_all[0][1])
 
@@ -133,6 +133,74 @@ def single_branch(image_input,config,sess,train_manager):
       
   #return  predicted_steers,predicted_acc,predicted_brake
   return  predicted_steers,predicted_speed
+
+
+def single_branch_steer_only(image_input,config,sess,train_manager):
+  
+  #branches = train_manager._output_network
+  all_net = train_manager._output_network
+  x = train_manager._input_images 
+  dout = train_manager._dout
+  #input_speed = train_manager._input_data[config.inputs_names.index("Speed")]
+  #input_control =  train_manager._input_data[config.inputs_names.index("Control")]
+
+  image_input = image_input.reshape((1,config.image_size[0],config.image_size[1],config.image_size[2]))
+
+  #speed = np.array(speed/config.speed_factor)
+
+  #speed = speed.reshape((1,1))
+
+  '''if control_input ==2 or control_input==0.0:
+    all_net = branches[0]
+  elif control_input == 3:
+    all_net = branches[2]
+  elif control_input == 4:
+    all_net = branches[3]
+  elif control_input == 5:
+    all_net = branches[1]'''
+
+
+  #print clip_input.shape
+
+  #input_vec = input_vec.reshape((1,config.input_size[0]*config.input_size[1]*config.input_size[2]))
+
+
+  #image_result = Image.fromarray((scipy.misc.imresize(image_input[0],(210,280,3))).astype(np.uint8))
+      
+      
+  #image_result.save(str('saida_res.jpg'))
+
+  feedDict = {x: image_input,dout: [1]*len(config.dropout) }
+
+
+  output_all = sess.run(all_net, feed_dict=feedDict)    #when fetches in a tensor, the fetched value will be a numpy ndarray containing the value of that tensor
+
+
+  #******you will have to convert one-hot vectors back to a single steering variable*******
+  #index = tf.argmax(one_hot_vector, axis=1)  #something like this
+
+
+  '''print len(output_all)   #1
+  print len(output_all[0])  #1
+  print len(output_all[0][0]) #2
+  print output_all[0][0][0]   #prints steer value
+  print output_all[0][0][1]   #prints speed value'''
+
+  '''predicted_steers = (output_all[0][0][0])
+  for i in range(len(predicted_steers)):
+    predicted_steers[i] = int(round(predicted_steers[i]))'''
+
+  predicted_steers = int(round(output_all[0][0][0]))
+  #predicted_speed = (output_all[0][0][1])
+  predicted_speed = 7.0   #fixing speed to max
+
+  #predicted_acc = (output_all[0][1])
+
+  #predicted_brake = (output_all[0][2])
+      
+  #return  predicted_steers,predicted_acc,predicted_brake
+  return  predicted_steers,predicted_speed
+
 
 def branched_speed_4cmd(image_input,speed,control_input,config,sess,train_manager):
 

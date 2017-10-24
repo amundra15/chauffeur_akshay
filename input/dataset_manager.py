@@ -28,9 +28,9 @@ class DatasetManager(object):
   def __init__(self,config):
 
     """ Read all hdf5_files """
-    self._images_train, self._datasets_train = self.read_all_files(config.train_db_path,config.dataset_names)
+    self._images_train, self._datasets_train = self.read_all_files(config.train_db_path,config.sensor_names,config.dataset_names)
 
-    self._images_val, self._datasets_val = self.read_all_files(config.val_db_path, config.dataset_names)
+    self._images_val, self._datasets_val = self.read_all_files(config.val_db_path, config.sensor_names, config.dataset_names)
 
     #print '******'
     '''print len(self._images_train)     #prints number of hdf5 train files
@@ -107,10 +107,16 @@ class DatasetManager(object):
 
 
 
-    self.train = Dataset(self._splited_keys_train,self._images_train, self._datasets_train,mean_image,config,config.augment)
+    '''self.train = Dataset(self._splited_keys_train,self._images_train, self._datasets_train,mean_image,config,config.augment)
     
 
     self.validation = Dataset(self._splited_keys_val,self._images_val, self._datasets_val,mean_image,config,None)  
+  '''
+
+    self.train = Dataset(self._splited_keys_train,self._images_train, self._datasets_train,config,config.augment)
+    
+
+    self.validation = Dataset(self._splited_keys_val,self._images_val, self._datasets_val,config,None)  
 
 
 
@@ -148,14 +154,16 @@ class DatasetManager(object):
     
 
 
-  def read_all_files(self,file_names,dataset_names):
+  def read_all_files(self,file_names,image_dataset_names,dataset_names):
    
 
 
 
     datasets_cat = [list([]) for _ in xrange(len(dataset_names))]
 
-    images_cat = []
+    images_data_cat = [list([]) for _ in xrange(len(image_dataset_names))]
+
+    #images_cat = []
 
 
     lastidx = 0
@@ -167,28 +175,19 @@ class DatasetManager(object):
           print count
           dset = h5py.File(cword, "r")  
 
-          x = dset["images_center"]          
-          old_shape = x.shape[0]
+          for i in range(len(image_dataset_names)):
+            #print image_dataset_names[i]
+            x = dset[image_dataset_names[i]]
+            #print x
+            old_shape = x.shape[0]
+            #print old_shape
 
-
-
-          images_cat.append((lastidx, lastidx+x.shape[0], x))
+            images_data_cat[i].append((lastidx, lastidx+x.shape[0], x))
 
 
           for i in range(len(dataset_names)):
 
             dset_to_append = dset[dataset_names[i]]
-
-
-            if dset_to_append.shape[1] <23:
-              zero_vec = np.zeros((1,dset_to_append.shape[0]))
-
-              dset_to_append = np.insert(dset_to_append,15,zero_vec,axis=1)
-
-            if dset_to_append.shape[1] >23 and dset_to_append.shape[1] <26:  # carla case
-              zero_vec = np.zeros((dset_to_append.shape[0],1))
-
-              dset_to_append = np.append(dset_to_append,zero_vec,axis=1)
 
 
             datasets_cat[i].append( dset_to_append[:])
@@ -218,14 +217,15 @@ class DatasetManager(object):
 
 
 
-    return images_cat,datasets_cat
+    return images_data_cat,datasets_cat
 
 
 
 
 
 
-  def compute_average_number(self,images,splited_keys,input_size):
+    #no longer needed
+  '''def compute_average_number(self,images,splited_keys,input_size):
     
 
     mean_image = np.zeros((input_size[0], input_size[1],input_size[2]))
@@ -266,6 +266,6 @@ class DatasetManager(object):
 
     print mean_image
 
-    return mean_image
+    return mean_image'''
 
 

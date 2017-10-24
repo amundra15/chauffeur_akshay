@@ -88,6 +88,7 @@ class ElektraMachine(Driver):
     self._rear = False
     self.steering_direction = 0
     self._new_speed = 0
+    self.hold = False #car always keep running
 
 
     self._resolution = drive_conf.resolution
@@ -167,13 +168,13 @@ class ElektraMachine(Driver):
 
     #image_input = image_input - self._mean_image
     #print "2"
-    image_input = np.multiply(image_input, 1.0 / 127.0)
+    image_input = np.multiply(image_input, 1.0 / 255.0)
 
 
     #steer,acc,brake = self._control_function(image_input,speed,direction,self._config,self._sess,self._train_manager)
-    steer,_new_speed = machine_output_functions.single_branch(image_input,self._config,self._sess,self._train_manager)
+    steer,_new_speed = machine_output_functions.single_branch_steer_only(image_input,self._config,self._sess,self._train_manager)
 
-
+    #note: we are not training for speed as of now. so network just returns speed value as 7 always
 
     control = Control()
     control.speed = _new_speed
@@ -219,24 +220,39 @@ class ElektraMachine(Driver):
 
   
   def act(self,action):
+
     #sending direction to pi
-    if self.steering_direction == 0:
+    if control.steer == 0:
         MESSAGE = 'x';  
         print MESSAGE               
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    elif self.steering_direction == 1:
+    elif control.steer == 1:
         MESSAGE = 'd';  
         print MESSAGE               
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    elif self.steering_direction == -1:
+    elif control.steer == -1:
         MESSAGE = 'a';  
         print MESSAGE               
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
+
+    #sending on/off to pi
+    if self.hold == True:
+        MESSAGE = 'h';  #hold
+        print MESSAGE               
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    else:
+    #if self.resume == True:
+        MESSAGE = 'r';  #resume
+        print MESSAGE               
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+
+
+
     
     #sending the speed
     #you may have to define self._new_speed and self._old_speed in class definition
-    change= int((self._new_speed-self._old_speed)/0.7)
+    '''change= int((self._new_speed-self._old_speed)/0.7)
   
     if(change<0):
       print "Control for decrease"
@@ -256,7 +272,7 @@ class ElektraMachine(Driver):
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
       MESSAGE = 'w'
       print MESSAGE
-      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))'''
 
 
 

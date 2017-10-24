@@ -1,3 +1,5 @@
+import sys
+sys.path.append('train')
 
 import numpy as np
 
@@ -20,13 +22,14 @@ class Dataset(object):
 
 
 
-  def __init__(self,splited_keys,images,datasets ,mean_image,config_input,augmenter):
+  #def __init__(self,splited_keys,images,datasets ,mean_image,config_input,augmenter):
+  def __init__(self,splited_keys,images,datasets ,config_input,augmenter):
 
 
     self._splited_keys = splited_keys
     self._images = images
     self._variables = np.concatenate(tuple(datasets), axis=0)  # Cat the datasets
-    self._mean_image = mean_image
+    #self._mean_image = mean_image
     self._positions_to_train = range(0,config_input.number_steering_bins) # WARNING THIS NEED TO BE A MULTIPLE OF THE NUMBER OF CLIPS
 
     self._iteration =0
@@ -297,50 +300,77 @@ class Dataset(object):
 
   """Return the next `batch_size` examples from this data set."""
   def next_batch(self):
-    
+
     
     batch_size = self._batch_size
 
 
-    images,generated_ids = self.datagen(1 , batch_size,len(self._splited_keys))
+    sensors,generated_ids = self.datagen(1 , batch_size,len(self._splited_keys))
 
 
+    # Get the images 
+    for i in range(len(sensors)):
+      sensors[i] =  np.array((sensors[i]))
 
-    images =  np.array((images))
+      if self._config.sensor_names[i] == 'rgb':
+        if self._augmenter != None:
+          sensors[i] = self._augmenter.augment_images(sensors[i])   #Applies general augmentation
+          augmenter_object = ImageAugmenter(self._config.augment_labels)
+          sensors[i] = augmenter_object.augmenter_function(sensors[i],sensors[self._config.sensor_names.index('labels')])  #augmentation based on segmentation labels
 
 
+      sensors[i]  = sensors[i].astype(np.float32)
 
 
-    if self._augmenter != None:
-
-      images = self._augmenter.augment_images(images)
-
-    images = images.astype(np.float32)
-
+    # Get the targets
     float_data = self._variables[:,generated_ids]
     targets =[]
     for i in range(len(self._config.targets_names)):
       targets.append(np.zeros((batch_size,self._config.targets_sizes[i])))
 
-    '''inputs = []
+
+    '''# Get the inputs
+    inputs = []
     for i in range(len(self._config.inputs_names)):
       inputs.append(np.zeros((batch_size,self._config.inputs_sizes[i])))'''
 
 
     for i in range(0,batch_size):
 
-        image = images[i,:,:,:]
+        for j in range(len(self._images)):
+          sensors[j][i,:,:,:] = np.multiply(sensors[j][i,:,:,:],1.0 / 255.0)
 
-        image = image - self._mean_image
-        #print "2"
-        image = np.multiply(image, 1.0 / 127.0)
 
         count =0
         for j in range(len(self._config.targets_names)):
           k = self._config.variable_names.index(self._config.targets_names[j])
           targets[count][i] = float_data[k,i]
+
           '''if self._config.targets_names[j] == "Speed":
             targets[count][i]/=self._config.speed_factor'''
+
+
+          '''if hasattr(self._config, 'extra_augment_factor'):
+            camera_pos = self._config.variable_names.index('Camera')
+            speed_pos = self._config.variable_names.index('Speed')
+
+            angle = 0.5236
+            #angle = self._config.variable_names.index('Angle') == 15
+
+            #########Augmentation!!!!
+            time_use =  1.0
+            car_lenght = 6.0
+            targets[count][i] -=min(self._config.extra_augment_factor*(math.atan((angle*car_lenght)/(time_use*float_data[speed_pos,i]+0.05)))/3.1415,0.2)
+          if hasattr(self._config, 'saturated_factor'):
+            angle = float_data[self._config.variable_names.index('Angle'),i]
+            #print angle
+            #########Augmentation!!!!
+            if angle < 0.0:
+
+              targets[count][i] =1.0
+            elif angle >0.0:
+              targets[count][i] =-1.0'''
+
           count += 1
 
 
@@ -349,42 +379,39 @@ class Dataset(object):
           k = self._config.variable_names.index(self._config.inputs_names[j])
 
           if self._config.inputs_names[j] == "Control":
-            if hasattr(self._config, 'control_encoding'):
-              if self._config.control_encoding ==4:
-                #print float_data[k,i]
-                inputs[count][i] = encode4(float_data[k,i])
-              else:
-                inputs[count][i] = encode8(float_data[k,i])
-            else:
-              inputs[count][i] = encode(float_data[k,i])
+         
+            inputs[count][i] = encode(float_data[k,i])
 
 
           if self._config.inputs_names[j] == "Speed":
             inputs[count][i] = float_data[k,i]/self._config.speed_factor
 
           if self._config.inputs_names[j] == "Distance":
-
             inputs[count][i] = check_distance(float_data[k,i])
 
 
           if self._config.inputs_names[j] == "Goal":
+            module = math.sqrt(float_data[k,i]*float_data[k,i] + float_data[k+1,i]*float_data[k+1,i])
+            #print 'k ',k
+            #print 'module',module
+            #print 'float_data',float_data[k,i],float_data[k+1,i]
+            float_data[k,i] = float_data[k,i]/module
+            float_data[k+1,i] = float_data[k+1,i]/module
 
-            inputs[count][i] = float_data[k:k+1,i]
+            inputs[count][i] = float_data[k:k+2,i]
+
+
 
 
           count += 1'''
 
        
 
-        
-
-        images[i,:,:,:] =  image
-
 
 
 
     #return images, targets,inputs
-    return images, targets
+    return sensors[0], targets
 
 
   def process_run(self,sess,data_loaded):

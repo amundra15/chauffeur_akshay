@@ -206,7 +206,7 @@ class CarlaMachine(Runnable,Driver):
 
     #image_input = image_input - self._mean_image
     #print "2"
-    image_input = np.multiply(image_input, 1.0 / 127.0)
+    image_input = np.multiply(image_input, 1.0 / 255.0)
 
 
     #steer,acc,brake = machine_output_functions.single_branch(image_input,speed,direction,self._config,self._sess,self._train_manager)
