@@ -16,7 +16,7 @@ import logging
 
 import socket
 
-camera_port = 0   # Change this to your webcam ID, or file name for your video file
+camera_port = 1   # Change this to your webcam ID, or file name for your video file
 ramp_frames = 30  #Number of frames to throw away while the camera adjusts to light levels
 #rval = True
 
@@ -298,8 +298,8 @@ class ElektraHuman(Driver):
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
         self.hold = False #cos we want to send the signal
-      else:
-      #if self.resume == True:
+      
+      if self.resume == True:
         MESSAGE = 'r';	#resume
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))

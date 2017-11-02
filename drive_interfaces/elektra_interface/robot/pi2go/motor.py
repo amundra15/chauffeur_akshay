@@ -108,14 +108,14 @@ try:
     		if turnflag == 'l':				#Wheel at left
 			print 'Spin right to centre'
 			pi2go.spinRight(speed, roll)
-                        time.sleep(0.21)		#0.9 for road, 0.21 when in air
+                        time.sleep(0.23)		#0.9 for road, 0.21 when in air
                         pi2go.forward(speed)
                         turnflag = 's'
 
                 elif turnflag == 'r':				#Wheel at right
 			print 'Spin left to centre'
 			pi2go.spinLeft(speed, roll)
-                        time.sleep(0.21)		#0.9 for road, 0.21 when in air
+                        time.sleep(0.23)		#0.9 for road, 0.21 when in air
                         pi2go.forward(speed)
                         turnflag = 's'
 
