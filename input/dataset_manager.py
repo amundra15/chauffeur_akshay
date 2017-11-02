@@ -113,6 +113,7 @@ class DatasetManager(object):
     self.validation = Dataset(self._splited_keys_val,self._images_val, self._datasets_val,mean_image,config,None)  
   '''
 
+    #[0] added later. you may have to delete depending on case
     self.train = Dataset(self._splited_keys_train,self._images_train, self._datasets_train,config,config.augment)
     
 

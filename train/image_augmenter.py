@@ -8,8 +8,9 @@ from imgaug import augmenters as iaa
 class ImageAugmenter(object):
 
 
-    def __init__(self,augment_labels):
-        self._augment_lables = augment_labels
+    def __init__(self,labels_to_augment,augment_amount):
+        self._labels_to_augment = labels_to_augment
+        self._augment_amount = augment_amount
 
 
     def augmenter_function(self,images,labels):
@@ -18,60 +19,157 @@ class ImageAugmenter(object):
         medium = lambda aug: iaa.Sometimes(0.6, aug)
         low = lambda aug: iaa.Sometimes(0.15, aug)
 
+        if(self._augment_amount == 3):      #max augmentation
+            road_aug = iaa.Sequential([
+                high(iaa.Multiply((0.5, 1.25))),
+                #texture
+                iaa.SomeOf(1 , [
+                #iaa.AdditiveGaussianNoise(scale=(0, 0.01*255)),
+                high(iaa.AddElementwise((-10, 10))),
+                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
+            ])])
 
-        road_aug = iaa.Sequential([
-            high(iaa.Multiply((0.25, 1.25))),
-            #texture
-            iaa.SomeOf(1 , [
-            #iaa.AdditiveGaussianNoise(scale=(0, 0.01*255)),
-            high(iaa.AddElementwise((-10, 10))),
-            medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
-            medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
-        ])])
+            building_aug = iaa.Sequential([
+                high(iaa.Multiply((0.5, 1.5), per_channel=0.8)),
+                #texture
+                iaa.SomeOf(1, [
+                high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
+                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
+            ])])
 
-        building_aug = iaa.Sequential([
-            high(iaa.Multiply((0.5, 1.5), per_channel=0.8)),
-            #texture
-            iaa.SomeOf(1, [
-            high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
-            medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
-            medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
-        ])])
+            grass_aug = iaa.Sequential([
+                iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
+                (iaa.WithChannels(0, iaa.Add((50, -50)))),
+                high(iaa.WithChannels(2, iaa.Add((-30,30)))),
+                iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
+                #texture
+                iaa.SomeOf(2, [
+                medium(iaa.AdditiveGaussianNoise(scale=(0, 0.05*255))),
+                medium(iaa.AddElementwise((-50, 50))),
+                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 128)))
+            ])])
 
-        grass_aug = iaa.Sequential([
-            iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
-            high(iaa.WithChannels(0, iaa.Add((50, -50)))),
-            high(iaa.WithChannels(2, iaa.Add((-30,30)))),
-            iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
-            #texture
-            iaa.SomeOf(2, [
-            medium(iaa.AdditiveGaussianNoise(scale=(0, 0.05*255))),
-            medium(iaa.AddElementwise((-50, 50))),
-            medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
-            medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
-            #low(iaa.Superpixels(p_replace=1, n_segments=(126, 128)))
-        ])])
+            sky_aug = iaa.Sequential([
+                iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
+                high(iaa.WithChannels(0, iaa.Add((-20, 20)))),
+                high(iaa.WithChannels(1, iaa.Add((0, 30)))),
+                high(iaa.WithChannels(2, iaa.Add((-10,0)))),
+                iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
+                medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
+                #texture
+                iaa.SomeOf(1, [
+                medium(iaa.AddElementwise((-5, 5))),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))
+            ])])
 
-        sky_aug = iaa.Sequential([
-            iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
-            high(iaa.WithChannels(0, iaa.Add((-20, 20)))),
-            high(iaa.WithChannels(1, iaa.Add((0, 30)))),
-            high(iaa.WithChannels(2, iaa.Add((-10,0)))),
-            iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
-            medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
-            #texture
-            iaa.SomeOf(1, [
-            medium(iaa.AddElementwise((-5, 5))),
-            medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
-            #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))
-        ])])
+
+        elif(self._augment_amount == 2):         #mid augmentation
+            road_aug = iaa.Sequential([
+                high(iaa.Multiply((0.75, 1.15))),
+                #texture
+                iaa.SomeOf(1 , [
+                #iaa.AdditiveGaussianNoise(scale=(0, 0.01*255)),
+                high(iaa.AddElementwise((-6, 6))),
+                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
+            ])])
+
+            building_aug = iaa.Sequential([
+                high(iaa.Multiply((0.5, 1.5), per_channel=0.8)),
+                #texture
+                iaa.SomeOf(1, [
+                high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
+                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
+            ])])
+
+            grass_aug = iaa.Sequential([
+                iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
+                (iaa.WithChannels(0, iaa.Add((50, -50)))),
+                high(iaa.WithChannels(2, iaa.Add((-30,30)))),
+                iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
+                #texture
+                iaa.SomeOf(2, [
+                medium(iaa.AdditiveGaussianNoise(scale=(0, 0.04*255))),
+                medium(iaa.AddElementwise((-30, 30))),
+                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 0.75), strength=(0.5, 1.5)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 128)))
+            ])])
+
+            sky_aug = iaa.Sequential([
+                iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
+                high(iaa.WithChannels(0, iaa.Add((-30, 30)))),
+                high(iaa.WithChannels(1, iaa.Add((0, 30)))),
+                high(iaa.WithChannels(2, iaa.Add((-10,0)))),
+                iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
+                medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
+                #texture
+                iaa.SomeOf(1, [
+                medium(iaa.AddElementwise((-5, 5))),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))
+            ])])
+
+
+        elif(self._augment_amount == 1):         #min augmentation
+            road_aug = iaa.Sequential([
+                high(iaa.Multiply((0.9, 1.05))),
+                #texture
+                iaa.SomeOf(1 , [
+                #iaa.AdditiveGaussianNoise(scale=(0, 0.01*255)),
+                high(iaa.AddElementwise((-3, 3))),
+                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.8, 1.2)))
+            ])])
+
+            building_aug = iaa.Sequential([
+                high(iaa.Multiply((0.5, 1.5), per_channel=0.8)),
+                #texture
+                iaa.SomeOf(1, [
+                high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
+                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
+            ])])
+
+            grass_aug = iaa.Sequential([
+                iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
+                (iaa.WithChannels(0, iaa.Add((50, -50)))),
+                high(iaa.WithChannels(2, iaa.Add((-30,30)))),
+                iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
+                #texture
+                iaa.SomeOf(2, [
+                medium(iaa.AdditiveGaussianNoise(scale=(0, 0.02*255))),
+                medium(iaa.AddElementwise((-10, 10))),
+                medium(iaa.Sharpen(alpha=(0.0, 0.5), lightness=1)),
+                medium(iaa.Emboss(alpha=(0.0, 0.5), strength=(0.5, 1.5)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 128)))
+            ])])
+
+            sky_aug = iaa.Sequential([
+                iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
+                high(iaa.WithChannels(0, iaa.Add((-20, 20)))),
+                high(iaa.WithChannels(1, iaa.Add((0, 10)))),
+                high(iaa.WithChannels(2, iaa.Add((-10,0)))),
+                iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
+                medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
+                #texture
+                iaa.SomeOf(1, [
+                medium(iaa.AddElementwise((-5, 5))),
+                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))
+            ])])
+
 
 
         grass = np.zeros_like(images)
         cond = labels == 9
-        #print cond.shape
         b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
-        #print b.shape 
         grass[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
 
         fence = np.zeros_like(images)
@@ -95,16 +193,16 @@ class ImageAugmenter(object):
         sky_n_zebra[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
 
 
-        if self._augment_lables["road"] == True:
+        if self._labels_to_augment["road"] == True:
             road = road_aug.augment_images(road)
 
-        if self._augment_lables["buildings"] == True:
+        if self._labels_to_augment["buildings"] == True:
             buildings = building_aug.augment_images(buildings)
 
-        if self._augment_lables["grass"] == True:
+        if self._labels_to_augment["grass"] == True:
             grass = grass_aug.augment_images(grass)
 
-        if self._augment_lables["sky_n_zebra"] == True:
+        if self._labels_to_augment["sky_n_zebra"] == True:
             sky_n_zebra = sky_aug.augment_images(sky_n_zebra)
 
         final = road + buildings + grass + sky_n_zebra + fence

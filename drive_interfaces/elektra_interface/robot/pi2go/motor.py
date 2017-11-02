@@ -91,7 +91,7 @@ try:
             pi2go.forward(speed)
             print 'Car stopped'
         elif keyp == 'r':
-            speed = 40
+            speed = 100
             pi2go.forward(speed)
             print 'Car resumed'
 

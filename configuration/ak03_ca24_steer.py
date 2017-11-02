@@ -1,4 +1,4 @@
-#This file implements ak02_ca24_ with augmentation per class. it also includes sensor names(to be recorded)
+#This file implements ak02_ca24_ with augmentation per class
 
 import random
 
@@ -47,8 +47,8 @@ class configMain:
 		# _N is noise, Yaw_S is angular speed
 
 
-		self.targets_names =['Steer','Speed']
-		self.targets_sizes = [1,1]
+		self.targets_names =['Steer']
+		self.targets_sizes = [1]
 
 		'''#for branching
 		self.inputs_names =['Control','Speed']
@@ -57,7 +57,7 @@ class configMain:
 		# if there is branching, this is used to build the network. Names should be same as targets
 		# currently the ["Steer"]x4 should not be changed
 		self.branch_config = [["Steer"],["Steer"],["Steer"],["Steer"],["Gas"],["Speed"]]'''
-		self.branch_config = [["Steer","Speed"]]
+		self.branch_config = [["Steer"]]
 		#Note: there is just one branch with steer and speed
 
 
@@ -69,6 +69,7 @@ class configMain:
 		self.restore = False # This is if you want to restore a saved model
 
 		self.sensor_names = ['rgb','labels']	#what all you want to store
+		self.sensors_size = [(88,200,3),(88,200,1)]
 
 		self.models_path = os.path.join('models', os.path.basename(__file__).split('.')[0])
 		self.train_path_write = os.path.join(self.models_path, 'train')
@@ -109,8 +110,9 @@ class configInput(configMain):
 		)
 
 		#Labels to be augmented individually
-		self.augment_labels = {"road": True, "buildings": True, "grass": True, "sky_n_zebra": True }
-
+		self.augment_labels = True
+		self.augment_amount = 3   #3=max, 2=mid, 1=min
+		self.labels_to_augment = {"road": True, "buildings": True, "grass": True, "sky_n_zebra": True }
 
 		# there are files with data, 200 images each, and here we select which ones to use
 
@@ -181,7 +183,7 @@ class configTrain(configMain):
 		self.training_schedule = [[50000,0.5],[100000,0.5*0.5],[150000,0.5*0.5*0.5],[200000,0.5*0.5*0.5*0.5],[250000,0.5*0.5*0.5*0.5*0.5]]    # Number of iterations, multiplying factor
 		self.lambda_l2 = 1e-3 # Not used
 		self.branch_loss_weight = [1.0]		#wights of each branch. wont matter for single branch case
-		self.variable_weight = {'Steer':0.875,'Speed':0.125}	#speed varies from 0 to 7, while steer from -1 to 1. thus bringing them to same scale
+		self.variable_weight = {'Steer':1.0}	#speed varies from 0 to 7, while steer from -1 to 1. thus bringing them to same scale
 		#self.output_weigth = [0.5,0.5]		#no longer used
 		self.network_name = 'controlNetSpeedP'	
 		self.lambda_tolerance = 5
@@ -210,7 +212,7 @@ class configOutput(configMain):
 		self.use_curses =True  # If we want to use curses library for a cutter print
 	
 
-		self.targets_to_print = ['Steer','Speed'] #predicted by network. on the terminal. Also prints the error. Maybe Energy
+		self.targets_to_print = ['Steer'] #predicted by network. on the terminal. Also prints the error. Maybe Energy
 		self.selected_branch = 0  # for the branches that have steering we also select the branch
 		#self.steer_branch = 0  # for the steer case we also have to select the branch
 		self.inputs_to_print = ['Steer']	#ground truth, given as data. on the terminal.

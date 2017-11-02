@@ -16,6 +16,7 @@ from scipy.ndimage.filters import gaussian_filter
 from skimage.transform import resize
 from codification import *
 
+from image_augmenter import *
 
 class Dataset(object):
 
@@ -92,6 +93,7 @@ class Dataset(object):
     return self._epochs_completed
 
   def get_batch_tensor(self):
+    #print 'returning batch tensor'
     return self._batch_tensor
 
 
@@ -234,14 +236,16 @@ class Dataset(object):
 
     
 
+    
+
 
   def datagen(self,time_len, batch_size,number_control_divisions):
 
 
-
-    
-    X_batch = np.zeros((batch_size, self._config.image_size[0], self._config.image_size[1],self._config.image_size[2]), dtype='uint8')
-    #output = np.zeros((batch_size, time_len/resample_stride, self._data_output_size), dtype='float32')
+    sensors_batch = []
+    for i in range(len(self._images)):
+      sensors_batch.append( np.zeros((batch_size, self._config.sensors_size[i][0],\
+       self._config.sensors_size[i][1],self._config.sensors_size[i][2]), dtype='uint8'))
     generated_ids = np.zeros((batch_size),dtype='int32')
 
 
@@ -264,38 +268,34 @@ class Dataset(object):
 
           for outer_n in sampled_positions:
 
-
+            #print ' bin of ',control_part,' has len ', len(self._splited_keys[control_part][outer_n])
             i = random.choice(self._splited_keys[control_part][outer_n]) 
 
 
+            for s in range(len(self._images)):
+              for es, ee, x in self._images[s]:
 
-            for es, ee, x in self._images:
-
-              if i >= es and i < ee:
-
-
-                image = np.array(x[i-es-time_len+1:i-es+1,:,:,:])
-
-                X_batch[count,:,:,:] = image
-                break
+                if i >= es and i < ee:
 
 
+                  image = np.array(x[i-es-time_len+1:i-es+1,:,:,:])
 
-            #begin_next_sequence =self._sequences.index(seq_found+1)*images_per_sequence
-            #print pos_inside
-            #number_of_images = min(images_per_sequence-pos_inside,time_len)
+                  sensors_batch[s][count,:,:,:] = image
+                  break
+
 
             generated_ids[count] = i
             count +=1
 
 
 
-        return X_batch,generated_ids
+        return sensors_batch,generated_ids
       except KeyboardInterrupt:
         raise
       except:
         traceback.print_exc()
         pass
+
 
 
   """Return the next `batch_size` examples from this data set."""
@@ -313,10 +313,11 @@ class Dataset(object):
       sensors[i] =  np.array((sensors[i]))
 
       if self._config.sensor_names[i] == 'rgb':
-        if self._augmenter != None:
+        if self._augmenter != None:     #i.e. it is not validation set
           sensors[i] = self._augmenter.augment_images(sensors[i])   #Applies general augmentation
-          augmenter_object = ImageAugmenter(self._config.augment_labels)
-          sensors[i] = augmenter_object.augmenter_function(sensors[i],sensors[self._config.sensor_names.index('labels')])  #augmentation based on segmentation labels
+          if self._config.augment_labels == True:
+            augmenter_object = ImageAugmenter(self._config.labels_to_augment,self._config.augment_amount)
+            sensors[i] = augmenter_object.augmenter_function(sensors[i],sensors[self._config.sensor_names.index('labels')])  #augmentation based on segmentation labels
 
 
       sensors[i]  = sensors[i].astype(np.float32)

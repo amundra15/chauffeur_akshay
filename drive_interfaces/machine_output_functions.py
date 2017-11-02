@@ -124,7 +124,7 @@ def single_branch(image_input,config,sess,train_manager):
     predicted_steers[i] = int(round(predicted_steers[i]))'''
 
   predicted_steers = int(round(output_all[0][0][0]))
-  predicted_speed = (output_all[0][0][1])
+  predicted_speed = 7   #(output_all[0][0][1])
   
 
   #predicted_acc = (output_all[0][1])

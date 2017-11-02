@@ -38,20 +38,22 @@ class ElektraHuman(Driver):
 
   # Initializes
   # Do everything needed to start the system.
-  def __init__(self,drive_conf):
+  def __init__(self,drive_conf,input_method):
     
     Driver.__init__(self)
 
     self._augment_left_right = drive_conf.augment_left_right
  
-    self._augmentation_camera_angles = drive_conf.camera_angle 
+    self._augmentation_camera_angles = drive_conf.camera_angle
+
+    self._input_method = input_method
 
     self._recording= False    
     self._rear = False
     self.steering_direction = 0
     self._new_speed = 0
     self.hold = True
-    #self.resume = False
+    self.resume = False
     #self.camera
 
 
@@ -79,46 +81,47 @@ class ElektraHuman(Driver):
     
     # Start any background process... etc.
 
-    # Start the interface with the joystick 
-    '''pygame.joystick.init()
-    joystick_count = pygame.joystick.get_count()
-    if joystick_count >1:
-      print "Please Connect Just One Joystick"
-      raise 
-    print "joystick count:"
-    print joystick_count
-    self.joystick = pygame.joystick.Joystick(0)
-    self.joystick.init()'''
-    #print self.joystick.get_numbuttons()
+    # Start the interface with the joystick (if using)
+    if(self._input_method == 'xbox'):
+      #pygame.joystick.init()
+      joystick_count = pygame.joystick.get_count()
+      if joystick_count >1:
+        print "Please Connect Just One Joystick"
+        raise 
+      print "joystick count: ", joystick_count
+      self.joystick = pygame.joystick.Joystick(0)
+      self.joystick.init()
+      print 'USE XBOX JOYSTICK...'
+      #print self.joystick.get_numbuttons()
     
 
-    #initialize pygame for keyboard
-    pygame.init()
-    #clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((100,100))
-    event=pygame.event.poll()
+    #otherwise initialize pygame for keyboard 
+    else:
+      pygame.init()
+      #clock = pygame.time.Clock()
+      screen = pygame.display.set_mode((100,100))
+      event=pygame.event.poll()
+      print 'USE KEYBOARD...'
 
     
 
-
-
- 
 
   def get_recording(self):
+
     # Joystick command to activate and deactivate record
+    if(self._input_method == 'xbox'):
+      if( self.joystick.get_button( 2 )):
+        self._recording =True
+      if( self.joystick.get_button( 1 )):
+        self._recording=False
 
-    '''if( self.joystick.get_button( 2 )):
-      self._recording =True
-    if( self.joystick.get_button( 1 )):
-      self._recording=False'''
-
+    else:
+      keys = pygame.key.get_pressed()
+      if keys[pygame.K_r]:
+        self._recording =True
+      if keys[pygame.K_t]:
+        self._recording=False
     
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_r]:
-      self._recording =True
-    if keys[pygame.K_t]:
-      self._recording=False
-
     return self._recording
 
 
@@ -141,70 +144,67 @@ class ElektraHuman(Driver):
     self._old_speed = speed
     global start_time
 
-    #print "taking joystick commands"
     """ Get Steering """
+    if(self._input_method == 'xbox'):
+      if self.joystick.get_button( 6 ):  #left
+        self.steering_direction = -1
+        print "left"
+      elif self.joystick.get_button( 7 ): #right
+        self.steering_direction = 1
+        print "right"
+      else:
+        self.steering_direction = 0    #when left or right button is not pressed, bring the steering to centre
 
-    '''if self.joystick.get_button( 6 ):  #left
-      self.steering_direction = -1
-      print "left"
-    elif self.joystick.get_button( 7 ): #right
-      self.steering_direction = 1
-      print "right"
     else:
-      self.steering_direction = 0'''     #when left or right button is not pressed, bring the steering to centre
+      keys = pygame.key.get_pressed()
+      if keys[pygame.K_a]:
+        self.steering_direction = -1
+        #print "left"
+      elif keys[pygame.K_d]:
+        self.steering_direction = 1
+        #print "right"
+      else:
+        self.steering_direction = 0     #when left or right button is not pressed, bring the steering to centre
+        #print "in zero"
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_a]:
-      self.steering_direction = -1
-      #print "left"
-    elif keys[pygame.K_d]:
-      self.steering_direction = 1
-      #print "right"
+
+
+    """Get Speed"""
+    if(self._input_method == 'xbox'):
+      if( self.joystick.get_button(3)):  #increase speed
+        print "inc speed"
+        end_time = datetime.datetime.now()
+        time_diff = (end_time - start_time).microseconds / 1000   #in milliseconds
+        if time_diff > 300: #to ensure same click isnt counted multiple times
+          self._new_speed = self._old_speed + 0.7   #max speed = 7 kmph, changes in 10 steps
+          self._new_speed = min(7, self._new_speed) #restrict between 0-7
+          start_time = datetime.datetime.now()   
+      if( self.joystick.get_button(0)):  #decrease speed
+        print "dec speed"
+        end_time = datetime.datetime.now()
+        time_diff = (end_time - start_time).microseconds / 1000
+        if time_diff > 300:
+          self._new_speed = self._old_speed - 0.7
+          self._new_speed = max(0, self._new_speed)
+          start_time = datetime.datetime.now()
+
     else:
-      self.steering_direction = 0     #when left or right button is not pressed, bring the steering to centre
-      #print "in zero"
-
-
-
-
-    '''#commenting cos we are no longer controlling speed
-    if( self.joystick.get_button(3)):  #increase speed
-      print "inc speed"
-      end_time = datetime.datetime.now()
-      time_diff = (end_time - start_time).microseconds / 1000   #in milliseconds
-      if time_diff > 300: #to ensure same click isnt counted multiple times
-        self._new_speed = self._old_speed + 0.7   #max speed = 7 kmph, changes in 10 steps
-        self._new_speed = min(7, self._new_speed) #restrict between 0-7
-        start_time = datetime.datetime.now()
-    
-    if( self.joystick.get_button(0)):  #decrease speed
-      print "dec speed"
-      end_time = datetime.datetime.now()
-      time_diff = (end_time - start_time).microseconds / 1000
-      if time_diff > 300:
-        self._new_speed = self._old_speed - 0.7
-        self._new_speed = max(0, self._new_speed)
-        start_time = datetime.datetime.now()'''
-
-
-
-
-    #keys = pygame.key.get_pressed()
-    if keys[pygame.K_s]:   #decrease speed to zero
-      self.hold = True
-      print "hold"
-      self._new_speed = 0
-
-
-    #keys = pygame.key.get_pressed()
-    if keys[pygame.K_w]:   #increase speed to max
-      self.hold = False
-      print "resume"
-      self._new_speed = 7
+      #keys = pygame.key.get_pressed()
+      if keys[pygame.K_s]:   #decrease speed to zero
+        self.hold = True
+        self.resume = False
+        print "hold"
+        self._new_speed = 0
+      #keys = pygame.key.get_pressed()
+      if keys[pygame.K_w]:   #increase speed to max
+        self.resume = True
+        self.hold = False
+        print "resume"
+        self._new_speed = 7
 
     
 
-    #keys = pygame.key.get_pressed()
+    '''#keys = pygame.key.get_pressed()
     if keys[pygame.K_b]:  
       self._rear = True
 
@@ -213,12 +213,13 @@ class ElektraHuman(Driver):
       self._rear = False
 
     if self._rear == True:
-      print "Taking Reverse.."
+      print "Taking Reverse.."'''
 
 
     print "new speed:", self._new_speed
     print "direction:", self.steering_direction
 
+    self._change = self._new_speed - self._old_speed
 
     control = Control()
     control.speed = self._new_speed
@@ -230,8 +231,6 @@ class ElektraHuman(Driver):
 
   def get_sensor_data(self):
 
-
-
     # Take the actual image we want to keep
     retval, frame = self.camera.read()  # Captures a single image from the camera in PIL format
 
@@ -240,17 +239,10 @@ class ElektraHuman(Driver):
     c=frame.shape[1]
     frame = frame[1:r, 1:c/2] #just take the left camera image
 
-    '''file = "./test_image15.png"
-    cv2.imwrite(file, frame)'''
+    #opencv reads image in BGR format. convert it to RGB before saving
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    '''cv2.imshow('image',frame)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()'''
- 
-  
-
-
-    # get all the measurements the car is making
+    # get other measurements the car is making
 
     return frame
 
@@ -274,40 +266,44 @@ class ElektraHuman(Driver):
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
 
-    #sending on/off to pi
-    if self.hold == True:
+    #sending speed to pi
+    if(self._input_method == 'xbox'):
+      #sending speed from 0 to 7, when controlling with xbox
+      if(self._change != 0):   #send signal only when there is change in speed. if you send continously, turning wheels doesnt work!
+        if(self._change<0):
+          print "Control for decrease"
+          for k in range(int(abs(self._change)/0.7)):    
+            MESSAGE = '<'
+            print MESSAGE
+            sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
+          MESSAGE = 'w'
+          print MESSAGE
+          sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))          
+  
+        else: 
+          print "Control for increase"    
+          for k in range(int(abs(self._change)/0.7)):    
+            MESSAGE = '>'
+            print MESSAGE
+            sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
+          MESSAGE = 'w'
+          print MESSAGE
+          sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+
+
+    else:
+      #sending on/off when controlling by keyboard
+      if self.hold == True:
         MESSAGE = 'h';	#hold
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    else:
-    #if self.resume == True:
+        self.hold = False #cos we want to send the signal
+      else:
+      #if self.resume == True:
         MESSAGE = 'r';	#resume
         print MESSAGE								
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-
-
-    #no longer controlling the speed as we train only for steering control. NOTE: uncommenting this code creates a problem that steer cant be handled with controller.
-  
-    '''if(change<0):
-      print "Control for decrease"
-      for k in range(abs(change)):    
-        MESSAGE = '<'
-        print MESSAGE
-        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
-      MESSAGE = 'w'
-      print MESSAGE
-      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))          
-  
-    else: 
-      print "Control for increase"    
-      for k in range(abs(change)):    
-        MESSAGE = '>'
-        print MESSAGE
-        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
-      MESSAGE = 'w'
-      print MESSAGE
-      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))'''
-
+        self.resume = False #cos we want to send the signal
 
 
   def end(self):

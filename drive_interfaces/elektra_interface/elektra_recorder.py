@@ -24,7 +24,7 @@ class Recorder(object):
 	# We assume a three camera case not many cameras per input ....
 
 
-	def __init__(self,file_prefix,image_size2,image_size1,current_file_number=0,record_image=True,number_of_images=1,image_cut=[65,265]):
+	def __init__(self,file_prefix,image_size2,image_size1,current_file_number=0,record_image=True,number_of_images=1,image_cut=[115,375]):
 
 		self._number_of_images = number_of_images
 		self._record_image_hdf5 = True
@@ -69,7 +69,7 @@ class Recorder(object):
 	def _create_new_db(self):
 
 		hf = h5py.File( self._file_prefix +'data_'+ str(self._current_file_number).zfill(5) +'.h5', 'w')
-		self.data_center= hf.create_dataset('images_center', (self._number_images_per_file,self._image_size2,self._image_size1,3),dtype=np.uint8)
+		self.data_center= hf.create_dataset('rgb', (self._number_images_per_file,self._image_size2,self._image_size1,3),dtype=np.uint8)
 		#data_right= hf.create_dataset('images_right', (max_number_images_per_file,image_size2,image_size1,3),'f')
 		self.data_rewards  = hf.create_dataset('targets', (self._number_images_per_file, self._number_rewards),'f')
 
@@ -121,6 +121,7 @@ class Recorder(object):
 
 			if self._record_image_hdf5:
 				#image = images[i][self._image_cut[0]:self._image_cut[1],:,:]
+				#images from zed camera are (375,671,3). you crop it to (260.671,3) and then resize to (88,200,3)
 				image = images[self._image_cut[0]:self._image_cut[1],:,:]
 				#print images[i].shape
 				#print self._image_cut

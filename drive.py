@@ -56,14 +56,26 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 			from carla_machine import CarlaMachine
 			driver = CarlaMachine("0",experiment_name,use_planner,'drive_interfaces/carla_interface/' + city_name  + '.txt',\
 				'drive_interfaces/carla_interface/' + city_name + '.png',augment_left_right=False)
-	else:
+
+	'''if drive_config.interface == "VirtualElektra":
+
+		from carla_recorder import Recorder
+
+		if drive_config.type_of_driver == "Human":
+			from virtual_elektra_human import VirtualElektraHuman
+			driver = VirtualElektraHuman(drive_config)
+		else:
+			from virtual_elektra_carla_machine import VirtualElektraMachine
+			driver = VirtualElektraMachine("0",experiment_name,drive_config,memory_use)'''
+
+	'''else:
 		from gta_recorder import Recorder
 		if type_of_driver == "Human":
 			from gta_human import GTAHuman
 			driver = GTAHuman()
 		else:
 			from gta_machine import GTAMachine
-			driver = GTAMachine("0",experiment_name)
+			driver = GTAMachine("0",experiment_name)'''
 
 		#gta_surface = get_gta_map_surface((800,600))
 	# Instance the environemnt

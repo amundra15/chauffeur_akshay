@@ -45,12 +45,12 @@ def frame2numpy(frame, frameSize):
 	return np.resize(np.fromstring(frame, dtype='uint8'), (frameSize[1], frameSize[0], 3))
 
 # TODO: TURN this into A FACTORY CLASS
-def get_instance(drive_config,experiment_name,drivers_name,memory_use):
+def get_instance(drive_config,experiment_name,drivers_name,memory_use,input_method):
 
 	from elektra_recorder import Recorder
 	if drive_config.type_of_driver == "Human":
 		from elektra_human import ElektraHuman
-		driver = ElektraHuman(drive_config)
+		driver = ElektraHuman(drive_config,input_method)
 	else:
 		from elektra_machine import ElektraMachine
 		driver = ElektraMachine("0",experiment_name,drive_config,memory_use)
@@ -69,10 +69,9 @@ def get_instance(drive_config,experiment_name,drivers_name,memory_use):
 
 
 
-def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
-	#host,port,gpu_number,path,show_screen,resolution,noise_type,config_path,type_of_driver,experiment_name,city_name,game,drivers_name
-
-	driver,recorder = get_instance(drive_config,experiment_name,name,memory_use)
+def drive_elektra(experiment_name,drive_config,input_method,name = None,memory_use=1.0, ):
+	
+	driver,recorder = get_instance(drive_config,experiment_name,name,memory_use,input_method)
 
 	noiser = Noiser(drive_config.noise)
 
@@ -93,8 +92,6 @@ def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
 		while direction != -1:
 			capture_time  = time.time()
 			images = driver.get_sensor_data()
-			#print 'fps',1.0/(time.time() - capture_time)
-			#sensor_data = frame2numpy(image,[800,600])
 
 
 			for event in pygame.event.get(): # User did something
@@ -116,7 +113,6 @@ def drive_elektra(experiment_name,drive_config,name = None,memory_use=1.0):
 			if recording:
 				print "RECORDING"
 				recorder.record(images,action.speed,action.steer,action_noisy.steer)
-				#recorder.record(images,action,action_noisy)
 
 
 			#####TODO: implement this for elektra

@@ -105,7 +105,6 @@ class TrainManager(object):
 	def run_train_step(self,batch_tensor,sess,i):
 
 
-
 		capture_time = time.time()
 		batch = sess.run(batch_tensor)
 
@@ -116,11 +115,9 @@ class TrainManager(object):
 				decrease_factor =position[1]
 				break
 
-
 		self._feedDict = {self._input_images:batch[0]}
 
 		count=1
-		
 		for i in range(len(self._config.targets_names)):
 
 			self._feedDict.update({self._targets_data[i]:batch[count]})
@@ -133,11 +130,9 @@ class TrainManager(object):
 			self._feedDict.update({self._input_data[i]:batch[count]})	
 			count+= 1'''
 
-
 		self._feedDict.update({self._variable_learning: decrease_factor* self._config.learning_rate,self._dout:self._config.dropout})
 
 		sess.run(self._train_step, feed_dict=self._feedDict)
-
 
 		return time.time() - capture_time
 

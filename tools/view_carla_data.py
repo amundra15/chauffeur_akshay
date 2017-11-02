@@ -185,14 +185,14 @@ if __name__ == "__main__":
   steering_pred =[]
   steering_gt =[]
 
-  positions_to_test =  range(0,3) #total hdf5 files
+  positions_to_test =  range(0,119) #total hdf5 files
   #positions_to_test = [93,104,170,173,229,245,283,397,413,425,565,581,591]
   #positions_to_test = range(0,660)
   #positions_to_test = [617,618,619,620,622,623,624,636,637,638,639]
   #positions_to_test =  [637,638]
   #positions_to_test = [55,108,109,353,410,411,426,441,442]
   #positions_to_test = [656,657,675,676,854,855,859,860,861,902]
-  path = '../ElektraData1/SeqTrain/'
+  path = '../ElektraData2/SeqTrain/'
 
 
   screen = ScreenManager()
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     
 
     # skip to highway
-    for i in range(0,198,4):   #every hdf5 files containg data for 200 images
+    for i in range(0,200,30):   #every hdf5 files containg data for 200 images
 
 
       #img = cam['X'][log['cam1_ptr'][i]].swapaxes(0,2).swapaxes(0,1)
@@ -248,7 +248,7 @@ if __name__ == "__main__":
       #print '***in view_carla_data****'
 
       
-      time.sleep(0.5) #to slow video down
+      time.sleep(0.15) #to slow video down
 
       steer_list.append((actions.steer))
       noisy_steer_list.append((noisy_steer))

@@ -66,6 +66,9 @@ class configMain:
 
 		self.restore = False # This is if you want to restore a saved model
 
+		self.sensor_names = ['images_center']
+		self.sensors_size = [(88,200,3)]
+
 		self.models_path = os.path.join('models', os.path.basename(__file__).split('.')[0])
 		self.train_path_write = os.path.join(self.models_path, 'train')
 		self.val_path_write = os.path.join(self.models_path, 'val')
@@ -114,7 +117,7 @@ class configInput(configMain):
 		#with open(os.path.join(self.save_data_stats, 'path'),'r') as f:
 		#	path = f.read().strip()
 
-		path = '../AkshayData3'
+		path = '../CarlaData3'
 		
 		train_path = os.path.join(path, 'SeqTrain')
 		val_path = os.path.join(path, 'SeqVal')
@@ -176,7 +179,7 @@ class configTrain(configMain):
 		self.training_schedule = [[50000,0.5],[100000,0.5*0.5],[150000,0.5*0.5*0.5],[200000,0.5*0.5*0.5*0.5],[250000,0.5*0.5*0.5*0.5*0.5]]    # Number of iterations, multiplying factor
 		self.lambda_l2 = 1e-3 # Not used
 		self.branch_loss_weight = [1.0]		#wights of each branch. wont matter for single branch case
-		self.variable_weight = {'Steer':0.875,'Speed':0.125}	#speed varies from 0 to 7, while steer from -1 to 1. thus bringing them to same scale
+		self.variable_weight = {'Steer':1.0}	#speed varies from 0 to 7, while steer from -1 to 1. thus bringing them to same scale
 		#self.output_weigth = [0.5,0.5] 	#no longer used
 		self.network_name = 'controlNetSpeedP'	
 		self.lambda_tolerance = 5

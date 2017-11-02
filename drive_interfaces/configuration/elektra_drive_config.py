@@ -1,4 +1,4 @@
-
+#specifies all the parameters related to elektra
 class configDrive:
 
   def __init__(self):
@@ -6,7 +6,7 @@ class configDrive:
     #self.experiment_name =''
 
     self.path = "../Desktop/" # If path is set go for it , if not expect a name set
-    self.resolution = [400,300]
+    self.resolution = [400,300] #not used
     self.noise = "None"
     self.type_of_driver = "Human"
     self.game = "Elektra"
@@ -16,7 +16,7 @@ class configDrive:
     #self.cameras_to_plot = {0:0,1:1,2:2}
     self.middle_camera = 0      #not used
     self.scale_factor = 2
-    self.image_cut =[65,265] # This is made from top to botton
+    self.image_cut =[115,375] # This is made from top to botton
     self.augment_left_right = False
     self.camera_angle = 30.0
     self.plot_vbp = False

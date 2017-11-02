@@ -75,19 +75,23 @@ def train(gpu_number, experiment_name):
 
   training_manager= TrainManager(conf_module.configTrain())
 
-
+  print 'building network'
   training_manager.build_network()
 
+  print 'building loss'
   training_manager.build_loss()
 
+  print 'building optimization'
   training_manager.build_optimization()
 
   """ Initializing Session as variables that control the session """
+  print 'initializing variables'
   sess.run(tf.global_variables_initializer())
   saver = tf.train.Saver(tf.global_variables(),max_to_keep=0)
 
 
   """Load a previous model if it is configured to restore """
+  print 'restoring checkpoint'
   cpkt = 0
   if config.restore:
     cpkt = restore_session(sess,saver,config.models_path)

@@ -84,6 +84,7 @@ class CarlaMachine(Runnable,Driver):
     
     config_gpu = tf.ConfigProto()
     config_gpu.gpu_options.visible_device_list=gpu_number
+    config_gpu.gpu_options.per_process_gpu_memory_fraction = 0.7
     self._sess = tf.Session(config=config_gpu)
    
     self._augment_left_right = augment_left_right

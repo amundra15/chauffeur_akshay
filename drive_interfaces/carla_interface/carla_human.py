@@ -69,6 +69,7 @@ class CarlaHuman(Driver):
 
 		
 		joystick_count = pygame.joystick.get_count()
+		print 'joystick count: ',joystick_count
 		if joystick_count >1:
 			print "Please Connect Just One Joystick"
 			raise 

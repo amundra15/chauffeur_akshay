@@ -69,6 +69,7 @@ class configMain:
 		self.restore = False # This is if you want to restore a saved model
 
 		self.sensor_names = ['rgb','labels']	#what all you want to store
+		self.sensors_size = [(88,200,3),(88,200,1)]
 
 		self.models_path = os.path.join('models', os.path.basename(__file__).split('.')[0])
 		self.train_path_write = os.path.join(self.models_path, 'train')
@@ -109,7 +110,9 @@ class configInput(configMain):
 		)
 
 		#Labels to be augmented individually
-		self.augment_labels = {"road": True, "buildings": True, "grass": True, "sky_n_zebra": True }
+		self.augment_labels = True
+		self.augment_amount = 3   #3=max, 2=mid, 1=min
+		self.labels_to_augment = {"road": True, "buildings": True, "grass": True, "sky_n_zebra": True }
 
 
 		# there are files with data, 200 images each, and here we select which ones to use

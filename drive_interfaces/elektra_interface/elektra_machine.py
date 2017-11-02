@@ -88,7 +88,7 @@ class ElektraMachine(Driver):
     self._rear = False
     self.steering_direction = 0
     self._new_speed = 0
-    self.hold = False #car always keep running
+    self.resume = True #car always keep running
 
 
     self._resolution = drive_conf.resolution
@@ -127,11 +127,10 @@ class ElektraMachine(Driver):
     self.camera = cv2.VideoCapture(camera_port)
  
     # Ramp the camera - these frames will be discarded and are only used to allow v4l2 to adjust light levels, if necessary
+    print("Adjusting brightness...")
     for i in xrange(ramp_frames):
       retval, temp = self.camera.read()
-      #print retval
-    print("Adjusting brightness...")
-    
+      #print retval   
 
 
 
@@ -205,21 +204,17 @@ class ElektraMachine(Driver):
     c=frame.shape[1]
     frame = frame[1:r, 1:c/2] #just take the left camera image
 
-    '''file = "./test_image15.png"
-    cv2.imwrite(file, frame)'''
-
-    '''cv2.imshow('image',frame)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()'''
+    #opencv reads image in BGR format. convert it to RGB before inferencing
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
 
-    # get all the measurements the car is making
+    # get other measurements the car is making
 
     return frame
 
 
   
-  def act(self,action):
+  def act(self,control):
 
     #sending direction to pi
     if control.steer == 0:
@@ -237,16 +232,16 @@ class ElektraMachine(Driver):
 
 
     #sending on/off to pi
-    if self.hold == True:
+    '''if self.hold == True:
         MESSAGE = 'h';  #hold
         print MESSAGE               
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    else:
-    #if self.resume == True:
+    else:'''
+    if self.resume == True:
         MESSAGE = 'r';  #resume
         print MESSAGE               
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-
+        self.resume = False #just send the signal once. it will keep running
 
 
     
@@ -274,33 +269,6 @@ class ElektraMachine(Driver):
       print MESSAGE
       sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))'''
 
-
-
-  '''def compute_perception_activations(self,sensor,speed):
-
-
-
-
-    sensor = sensor[self._image_cut[0]:self._image_cut[1],:,:]
-
-    sensor = scipy.misc.imresize(sensor,[self._config.network_input_size[0],self._config.network_input_size[1]])
-
-    image_input = sensor.astype(np.float32)
-
-    #print future_image
-
-    image_input = image_input - self._mean_image
-    #print "2"
-    image_input = np.multiply(image_input, 1.0 / 127.0)
-
-
-    vbp_image =  machine_output_functions.vbp(image_input,speed,self._config,self._sess,self._train_manager)
-
-    #min_max_scaler = preprocessing.MinMaxScaler()
-    #vbp_image = min_max_scaler.fit_transform(np.squeeze(vbp_image))
-
-    #print vbp_image.shape
-    return 0.5*grayscale_colormap(np.squeeze(vbp_image),'jet') + 0.5*image_input'''
 
 
   def end(self):

@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
   # Drive
   parser.add_argument('-dc', '--driver_config', help="Drive config file used for driving(just for elektra right now)", default="elektra_drive_config")
-  parser.add_argument('-cc', '--carla-config', help="Carla config file used for driving", default="./drive_interfaces/carla_interface/CarlaSettings.ini")
+  parser.add_argument('-cc', '--carla_config', help="Carla config file used for driving", default="./drive_interfaces/carla_interface/CarlaSettings.ini")
   parser.add_argument('-l', '--host', type=str, default='158.109.9.238', help='The IP where DeepGTAV is running')
   parser.add_argument('-p', '--port', default=8000, help='The port where DeepGTAV is running')  
   parser.add_argument('-pt','--path', type=str,default="../Desktop/", help='Path to Store outputs')
@@ -107,7 +107,7 @@ if __name__ == '__main__':
   parser.add_argument('--driver', default="Human", help='Select who is driving, a human or a machine')
   parser.add_argument('-ga','--game', default="Carla", help='The game being used as interface')
   parser.add_argument('-cy','--city', default="carla_0", help='select the graph from the city being used')
-
+  parser.add_argument('-im', '--input_method', default="keyboard", help = 'human controlling real car by keyboard or controller' )
 
   args = parser.parse_args()
   print args
@@ -138,9 +138,8 @@ if __name__ == '__main__':
       if args.game == 'Elektra':  #can later be clubbed with general case(handle drive_config object)
         driver_conf_module  = __import__(args.driver_config)
         driver_conf= driver_conf_module.configDrive()
-        driver_conf = parse_drive_arguments(args,driver_conf)   #****TODO: check what this does
-        #drive_elektra(args.experiment_name,driver_conf,args.name,args.memory)
-        drive_elektra(args.experiment_name,driver_conf,args.name)
+        driver_conf = parse_drive_arguments(args,driver_conf)  
+        drive_elektra(args.experiment_name,driver_conf,args.input_method,args.name)
 
       else:
         drive(args.host,int(args.port),args.gpu,args.path,args.show_screen,resolution,args.noise,args.carla_config,args.driver,args.experiment_name,args.city,args.game,args.name)
