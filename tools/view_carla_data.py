@@ -38,137 +38,6 @@ class Control:
     reverse = 0
 
 
-#gta_surface = get_gta_map_surface()
-
-
-#for 3 cameras
-# ***** main loop *****
-'''if __name__ == "__main__":
-  parser = argparse.ArgumentParser(description='Path viewer')
-  #parser.add_argument('model', type=str, help='Path to model definition json. Model weights should be on the same path.')
-  parser.add_argument('--dataset', type=str, default="2016-06-08--11-46-01", help='Dataset/video clip name')
-  args = parser.parse_args()
-
-
-
-
-
-  dataset = args.dataset
-  first_time = True
-  count =0
-  steering_pred =[]
-  steering_gt =[]
-
-  positions_to_test =  range(1,1200)
-  #positions_to_test = [93,104,170,173,229,245,283,397,413,425,565,581,591]
-  #positions_to_test = range(0,660)
-  #positions_to_test = [617,618,619,620,622,623,624,636,637,638,639]
-  #positions_to_test =  [637,638]
-  #positions_to_test = [55,108,109,353,410,411,426,441,442]
-  #positions_to_test = [656,657,675,676,854,855,859,860,861,902]
-  path = '../AkshayData3/SeqTrain/'
-
-
-  screen = ScreenManager()
-
-  image_queue = deque()
-
-  speed_list = []
-  actions_queue = deque()
-
-  #for 3 augmented images
-  screen.start_screen([200,88],3,4)
-
-  #for 3 augmented images
-  images= [np.array([200,88,3]),np.array([200,88,3]),np.array([200,88,3])]
-  actions = [Control(),Control(),Control()]
-
-
-  for h_num in positions_to_test:
-
-    print " SEQUENCE NUMBER ",h_num
-    data = h5py.File(path+'data_'+ str(h_num).zfill(5) +'.h5', "r")
-
-    #redata = h5py.File('/media/adas/012B4138528FF294/NewGTA/redata_'+ str(h_num).zfill(5) +'.h5', "r")
-    #print log.keys()
-
-
-    
-    #save_data_stats = '../../../Data/Udacity/'
-
-    
-
-
-
-    # skip to highway
-    for i in range(0,198,12):   #every hdf5 files containg data for 200 images
-
-
-
-
-      #img = cam['X'][log['cam1_ptr'][i]].swapaxes(0,2).swapaxes(0,1)
-
-      img_1 = np.array(data['images_center'][i]).astype(np.uint8)
-
-
-      img_2 = np.array(data['images_center'][i+1]).astype(np.uint8)
-
-
-      img_3 = np.array(data['images_center'][i+2]).astype(np.uint8)
-
-
-      images[int(data['targets'][i][26])] =  img_1
-      images[int(data['targets'][i+1][26])] =  img_2
-      images[int(data['targets'][i+2][26])] =  img_3
-
-      action_1 = Control()
-      action_1.steer = data['targets'][i][0]
-      action_1.gas =data['targets'][i][1]
-      action_2 = Control()
-      action_2.steer = data['targets'][i+1][0]
-      action_2.gas =data['targets'][i+1][1]
-      action_3 = Control()
-      action_3.steer = data['targets'][i+2][0]
-      action_3.gas =data['targets'][i+2][1]
-      #print  data['targets'][i][20]
-      actions[int(data['targets'][i][26])] =action_1
-      actions[int(data['targets'][i+1][26])] =action_2
-      actions[int(data['targets'][i+2][26])] =action_3
-
-      direction = data['targets'][i+2][22]
-
-      speed = data['targets'][i+2][10]
-      time_use =  1.0
-      car_lenght = 6
-      actions[0].steer +=min(4*(math.atan((0.26*car_lenght)/(time_use*speed+0.05)))/3.1415,0.2)
-      actions[2].steer -=min(4*(math.atan((0.26*car_lenght)/(time_use*speed+0.05)))/3.1415,0.2)
-      print " Steer Left MIDDLE Right "
-      print actions[0].steer
-      print actions[1].steer
-      print actions[2].steer
-
-
-      #for j in range(3):
-      #  screen.plot3camrc( 0,images[j],\
-      #        actions[j],direction,0,\
-      #        [0,0],j) #
-
-      time.sleep(0.0)
-
-      speed_list.append((actions[1].steer))
-      #reimg = np.array(redata['images_center'][i])
-      #recontrol_input = np.array(redata['control'][i][1])
-      #print img
-      #img = img*255
-      #print img
-
-  plt.plot(range(0,len(speed_list)),speed_list)
-  
-  plt.show()
-  #save_gta_surface(gta_surface)'''
-
-
-
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Path viewer')
   #parser.add_argument('model', type=str, help='Path to model definition json. Model weights should be on the same path.')
@@ -185,14 +54,9 @@ if __name__ == "__main__":
   steering_pred =[]
   steering_gt =[]
 
-  positions_to_test =  range(0,119) #total hdf5 files
-  #positions_to_test = [93,104,170,173,229,245,283,397,413,425,565,581,591]
-  #positions_to_test = range(0,660)
-  #positions_to_test = [617,618,619,620,622,623,624,636,637,638,639]
-  #positions_to_test =  [637,638]
-  #positions_to_test = [55,108,109,353,410,411,426,441,442]
-  #positions_to_test = [656,657,675,676,854,855,859,860,861,902]
-  path = '../ElektraData2/SeqTrain/'
+  positions_to_test = range(38) #total hdf5 files
+
+  path = '../Desktop/2_Akshay_6/'
 
 
   screen = ScreenManager()
@@ -227,17 +91,73 @@ if __name__ == "__main__":
     
 
     # skip to highway
-    for i in range(0,200,30):   #every hdf5 files containg data for 200 images
+    for i in range(0,200,25):   #every hdf5 files containg data for 200 images
 
 
       #img = cam['X'][log['cam1_ptr'][i]].swapaxes(0,2).swapaxes(0,1)
 
 
-      images =  np.array(data['images_center'][i]).astype(np.uint8)
+      images =  np.array(data['rgb'][i]).astype(np.uint8)
 
       actions.steer = data['targets'][i][0]
       actions.gas = data['targets'][i][1]
       noisy_steer = data['targets'][i][5]
+
+      '''camera_angle = data['targets'][i][26]
+      car_angle = actions.steer * 20   #car_angle is steer angle wrt road in degrees. 20 is max possible steer in degrees
+      effective_angle = 4*camera_angle + car_angle
+      
+      print 'steer angle: ',actions.steer
+      print 'car_angle: ', car_angle
+      print 'camera angle: ', camera_angle
+      print 'effective angle: ', effective_angle'''
+      
+
+      '''if (effective_angle >= -7.5 and effective_angle <= 7.5):  #since cameras are at -15,0 and 15, central position would correspond to this
+        actions.steer = 0
+      elif effective_angle > 7.5:
+        actions.steer = -1.0
+      else:
+        actions.steer = 1.0'''
+
+      '''if actions.steer < 0.05 and actions.steer > -0.05:  #standard
+        if camera_angle < 0:
+          actions.steer = 1
+        elif camera_angle > 0:
+          actions.steer = -1
+          ########
+      elif actions.steer < 0.3 and actions.steer >= 0.05:
+        if camera_angle == -15:
+          actions.steer = 0
+        elif camera_angle < -15:
+          actions.steer = 1
+        else:
+          actions.steer = -1
+      elif actions.steer < 0.6 and actions.steer >= 0.3:
+        if camera_angle == -45:
+          actions.steer = 0
+        else:
+          actions.steer = 1
+      elif actions.steer >= 0.6:
+          actions.steer = 1
+          #######
+      elif actions.steer > -0.3 and actions.steer <= -0.05:
+        if camera_angle == 15:
+          actions.steer = 0
+        elif camera_angle < 15:
+          actions.steer = 1
+        else:
+          actions.steer = -1
+      elif actions.steer > -0.6 and actions.steer <= -0.3:
+        if camera_angle == 45:
+          actions.steer = 0
+        else:
+          actions.steer = 1
+      elif actions.steer <= -0.6:
+          actions.steer = -1
+
+      print 'steer on screen', actions.steer
+      print '****************************'''
 
 
       speed = data['targets'][i][10]
@@ -248,7 +168,7 @@ if __name__ == "__main__":
       #print '***in view_carla_data****'
 
       
-      time.sleep(0.15) #to slow video down
+      time.sleep(0.3) #to slow video down
 
       steer_list.append((actions.steer))
       noisy_steer_list.append((noisy_steer))

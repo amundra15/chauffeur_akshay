@@ -62,7 +62,7 @@ class configMain:
 
 		self.restore = True # This is if you want to restore a saved model
 
-		self.sensor_names = ['images_center']
+		self.sensor_names = ['rgb']
 		self.sensors_size = [(88,200,3)]
 
 		self.models_path = os.path.join('models', os.path.basename(__file__).split('.')[0])
@@ -119,7 +119,7 @@ class configInput(configMain):
 		#	path = f.read().strip()
 
 			
-		path = '../ElektraData2'
+		path = '../ElektraData4'
 
 
 		train_path = os.path.join(path, 'SeqTrain')

@@ -97,7 +97,7 @@ if __name__ == '__main__':
   # Drive
   parser.add_argument('-dc', '--driver_config', help="Drive config file used for driving(just for elektra right now)", default="elektra_drive_config")
   parser.add_argument('-cc', '--carla_config', help="Carla config file used for driving", default="./drive_interfaces/carla_interface/CarlaSettings.ini")
-  parser.add_argument('-l', '--host', type=str, default='158.109.9.238', help='The IP where DeepGTAV is running')
+  parser.add_argument('-l', '--host', type=str, default='127.0.0.1', help='The IP where DeepGTAV is running')
   parser.add_argument('-p', '--port', default=8000, help='The port where DeepGTAV is running')  
   parser.add_argument('-pt','--path', type=str,default="../Desktop/", help='Path to Store outputs')
   parser.add_argument('-nm','--name', type=str,default="Akshay", help='Name of the person who is going to drive')

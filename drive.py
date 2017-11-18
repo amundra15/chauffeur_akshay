@@ -98,6 +98,7 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 	direction = 2
 	old_speed = 0		#the speed we start the car with
 
+	machine_score = 0
 	iteration = 0
 	try:
 		while direction != -1:		#which never happens
@@ -185,10 +186,9 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 						,rewards.speed,0,0,None,rewards.reseted,driver.get_number_completions(),dist_to_goal,0) #
 			
 			if type_of_driver == "Machine":
-				pass
-				#image_vbp =driver.compute_perception_activations(image[0],rewards.speed)
+				current_score = get_score(current_location, current_inclination)
+				machine_score = machine_score + current_score
 
-				#screen_manager.plot_image(image_vbp,1)
 
 
 			iteration +=1

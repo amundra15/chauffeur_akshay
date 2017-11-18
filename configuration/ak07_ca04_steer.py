@@ -1,6 +1,5 @@
-#copy of ak05_cf45_steer.py with less augmentation
-
-#this file trains for data from virtual world elektra data by agent;steer only, implementing f01_ecf45_testsevencamera.py; also augments per label
+#this file trains for data from real world elektra data(steer only), implementing ak04_cf45_steer.py
+#dropout increased in this experiment
 
 import random
 
@@ -24,7 +23,7 @@ class configMain:
 		# when we need to sample a mini-batch, we sample bins and then sample inside the bins
 		self.number_steering_bins = 2
 
-		self.batch_size = self.number_steering_bins*60
+		self.batch_size=self.number_steering_bins*60
 		self.batch_size_val =  self.number_steering_bins*60
 		self.number_images_val = 20* self.batch_size_val # Number of images used in a validation Section
 
@@ -43,39 +42,10 @@ class configMain:
 		# y , x
 		self.image_size = (88,200,3)
 		self.network_input_size = (88,200,3)
-		self.variable_names = ['Steer','Gas','Brake','Hand_B','Reverse','Steer_N','Gas_N','Brake_N','Pos_X','Pos_Y','Speed',\
+		self.variable_names = ['Steer','Gas','Brake','Hand_B','Control','Steer_N','Gas_N','Brake_N','Pos_X','Pos_Y','Speed',\
 						'C_Gen','C_Ped','C_Car','Road_I','Side_I','Acc_x','Acc_y','Acc_z','Plat_Ts','Game_Ts','Ori_X','Ori_Y',\
-						'Ori_Z','Control','Camera','Angle']
+						'Ori_Z','Reverse','Camera','Angle']
 		# _N is noise, Yaw_S is angular speed 
-
-		'''#recorded VirtualElektraData2 in these positions
-			self.data_rewards[pos,0]  = actions.steer  
-			self.data_rewards[pos,1]  = actions.throttle 
-			self.data_rewards[pos,2]  = actions.brake  
-			self.data_rewards[pos,3]  = actions.hand_brake  
-			self.data_rewards[pos,4]  = actions.reverse
-			self.data_rewards[pos,5]  = action_noise.steer  
-			self.data_rewards[pos,6]  = action_noise.throttle  
-			self.data_rewards[pos,7]  = action_noise.brake  
-			self.data_rewards[pos,8]  = measurements['PlayerMeasurements'].transform.location.x
-			self.data_rewards[pos,9]  = measurements['PlayerMeasurements'].transform.location.y
-			self.data_rewards[pos,10]  = measurements['PlayerMeasurements'].forward_speed
-			self.data_rewards[pos,11]  = measurements['PlayerMeasurements'].collision_other
-			self.data_rewards[pos,12]  = measurements['PlayerMeasurements'].collision_pedestrians
-			self.data_rewards[pos,13]  = measurements['PlayerMeasurements'].collision_vehicles
-			self.data_rewards[pos,14]  = measurements['PlayerMeasurements'].intersection_otherlane
-			self.data_rewards[pos,15]  = measurements['PlayerMeasurements'].intersection_offroad
-			self.data_rewards[pos,16]  = measurements['PlayerMeasurements'].acceleration.x
-			self.data_rewards[pos,17]  = measurements['PlayerMeasurements'].acceleration.y
-			self.data_rewards[pos,18]  = measurements['PlayerMeasurements'].acceleration.z
-			self.data_rewards[pos,19]  = measurements['WallTime']
-			self.data_rewards[pos,20]  = measurements['GameTime']
-			self.data_rewards[pos,21]  = measurements['PlayerMeasurements'].transform.orientation.x
-			self.data_rewards[pos,22]  = measurements['PlayerMeasurements'].transform.orientation.y
-			self.data_rewards[pos,23]  = measurements['PlayerMeasurements'].transform.orientation.z
-			self.data_rewards[pos,24]  = direction
-			self.data_rewards[pos,25]  = i
-			self.data_rewards[pos,26]  = float(self._camera_dict[i][1])'''
 
 		self.targets_names =['Steer']
 		self.targets_sizes = [1]
@@ -89,13 +59,13 @@ class configMain:
 
 		# a list of keep_prob corresponding to the list of layers:
 		# 8 conv layers, 2 img FC layer,  5 branches X 2 FC layers each
-		self.dropout = [0.8]*8 + [0.5]*2  + [0.5,.5]*len(self.branch_config)
+		self.dropout = [0.85]*8 + [0.6]*2  + [0.6,0.6]*len(self.branch_config)
 
 
 		self.restore = True # This is if you want to restore a saved model
 
-		self.sensor_names = ['rgb','labels']	#what all you want to store
-		self.sensors_size = [(88,200,3),(88,200,1)]
+		self.sensor_names = ['rgb']
+		self.sensors_size = [(88,200,3)]
 
 		self.models_path = os.path.join('models', os.path.basename(__file__).split('.')[0])
 		self.train_path_write = os.path.join(self.models_path, 'train')
@@ -125,13 +95,13 @@ class configInput(configMain):
 		rl = lambda aug: iaa.Sometimes(0.09, aug)
 		self.augment = iaa.Sequential([
 
-			#decreased these augmentations as well
+
 	        rl(iaa.GaussianBlur((0, 1.5))), # blur images with a sigma between 0 and 1.5
 	        rl(iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05), per_channel=0.5)), # add gaussian noise to images
 	        oc(iaa.Dropout((0.0, 0.10), per_channel=0.5)), # randomly remove up to X% of the pixels
-	        oc(iaa.CoarseDropout((0.0, 0.05), size_percent=(0.08, 0.2),per_channel=0.5)), # randomly remove up to X% of the pixels
-	        oc(iaa.Add((-25, 25), per_channel=0.5)), # change brightness of images (by -X to Y of original value)
-	        st(iaa.Multiply((0.7, 1.8), per_channel=0.2)), # change brightness of images (X-Y% of original value)
+	        oc(iaa.CoarseDropout((0.0, 0.10), size_percent=(0.08, 0.2),per_channel=0.5)), # randomly remove up to X% of the pixels
+	        oc(iaa.Add((-40, 40), per_channel=0.5)), # change brightness of images (by -X to Y of original value)
+	        st(iaa.Multiply((0.10, 2.5), per_channel=0.2)), # change brightness of images (X-Y% of original value)
 	        rl(iaa.ContrastNormalization((0.5, 1.5), per_channel=0.5)), # improve or worsen the contrast
 	        rl(iaa.Grayscale((0.0, 1))), # put grayscale
 
@@ -139,10 +109,7 @@ class configInput(configMain):
 	        ],
 		    random_order=True # do all of the above in random order
 		)
-		self.augment_labels = True
-		self.augment_amount = 1   #3=max, 2=mid, 1=min
-		self.labels_to_augment = {"road": True, "buildings": True, "grass": True, "sky_n_zebra": True }
-
+		self.augment_labels = False
 
 
 
@@ -154,7 +121,7 @@ class configInput(configMain):
 		#	path = f.read().strip()
 
 			
-		path = '/run/user/1000/gvfs/sftp:host=158.109.8.101,port=22345,user=amundra/home-local/amundra/VirtualElektraData1/'
+		path = '../ElektraData4'
 
 
 		train_path = os.path.join(path, 'SeqTrain')
@@ -245,7 +212,7 @@ class configOutput(configMain):
 		# TODO : self.histograms_list=[]	self.features_to_draw=  self.weights_to_draw=
 
 
-'''class configTest(configMain):
+class configTest(configMain):
 
 	def __init__(self):
 
@@ -256,6 +223,7 @@ class configOutput(configMain):
 		self.driver_config = "3cam_carla_drive_config"
 
 
-		# This is the carla configuration related stuff'''
+		# This is the carla configuration related stuff
+
 
 

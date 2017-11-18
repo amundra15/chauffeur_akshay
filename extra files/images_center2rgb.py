@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 import os
 
-h5_folder = './SeqTrain/'
+h5_folder = './'
 file_list_vec = []
 file_list_vec.append(sorted(os.listdir(h5_folder)))
 number_of_files = len(file_list_vec[0])
@@ -13,9 +13,8 @@ for h_num in range(number_of_files):
 
 	ini_data = file['images_center'] 
 	shape = ini_data.shape
-	final_data = file.create_dataset('rgb', shape,dtype=np.uint8)
+	final_data = file.create_dataset('rgb', shape,dtype=np.uint8,data=ini_data)
 
-	file['rgb'] = file['images_center']
 	del file["images_center"]
 	
 	file.close()

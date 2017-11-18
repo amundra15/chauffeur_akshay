@@ -1,4 +1,4 @@
-
+#i use this only to collect data using agent
 import sys
 import pygame
 import socket
