@@ -58,7 +58,7 @@ class configMain:
 
 		# a list of keep_prob corresponding to the list of layers:
 		# 8 conv layers, 2 img FC layer,  5 branches X 2 FC layers each
-		self.dropout = [0.8]*8 + [0.5]*2  + [0.5,.5]*len(self.branch_config)
+		self.dropout = [0.8]*4 + [0.5]*1  + [0.5]*len(self.branch_config)
 
 
 		self.restore = True # This is if you want to restore a saved model

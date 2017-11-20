@@ -1,6 +1,5 @@
 #this file trains for data from real world elektra data(steer only), implementing ak04_cf45_steer.py
-#dropout decreased in this experiment
-
+#it uses a model with 6 conv layers
 import random
 
 import imgaug as ia
@@ -59,7 +58,7 @@ class configMain:
 
 		# a list of keep_prob corresponding to the list of layers:
 		# 8 conv layers, 2 img FC layer,  5 branches X 2 FC layers each
-		self.dropout = [0.85]*8 + [0.6]*2  + [0.6,0.6]*len(self.branch_config)
+		self.dropout = [0.8]*6 + [0.5]*1  + [0.5, 0.5]*len(self.branch_config)
 
 
 		self.restore = True # This is if you want to restore a saved model
@@ -170,14 +169,14 @@ class configTrain(configMain):
 		configMain.__init__(self)		
 
 
-		self.loss_function = 'mse_branched'  # Chose between: mse_branched, mse_branched_ladd
+		self.loss_function = 'mse_branched'  
 		self.control_mode ='base_no_speed'
 		self.learning_rate = 0.0002 # First
 		self.training_schedule = [[50000,0.5],[100000,0.5*0.5],[150000,0.5*0.5*0.5],[200000,0.5*0.5*0.5*0.5],[250000,0.5*0.5*0.5*0.5*0.5]]    # Number of iterations, multiplying factor
 		self.lambda_l2 = 1e-3 # Not used
 		self.branch_loss_weight = [1]
 		self.variable_weight = {'Steer':1.0}
-		self.network_name = 'baseNet_deeper_noSpeed'	
+		self.network_name = 'baseNet_6ConvLayer_noSpeed'	
 		self.lambda_tolerance = 5
 		self.is_training = True
 		self.selected_gpu = "0"
@@ -224,6 +223,5 @@ class configTest(configMain):
 
 
 		# This is the carla configuration related stuff
-
 
 

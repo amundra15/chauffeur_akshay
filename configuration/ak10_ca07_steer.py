@@ -1,5 +1,5 @@
-#this file trains for data from real world elektra data(steer only), implementing ak04_cf45_steer.py
-#dropout decreased in this experiment
+#this file trains for data from real world elektra data(steer only), implementing ak07_ca04_steer.py
+#image augmentation increased in this case(quite high)
 
 import random
 
@@ -59,7 +59,7 @@ class configMain:
 
 		# a list of keep_prob corresponding to the list of layers:
 		# 8 conv layers, 2 img FC layer,  5 branches X 2 FC layers each
-		self.dropout = [0.85]*8 + [0.6]*2  + [0.6,0.6]*len(self.branch_config)
+		self.dropout = [0.85]*8 + [0.65]*2  + [0.65,0.65]*len(self.branch_config)
 
 
 		self.restore = True # This is if you want to restore a saved model
@@ -96,14 +96,14 @@ class configInput(configMain):
 		self.augment = iaa.Sequential([
 
 
-	        rl(iaa.GaussianBlur((0, 1.5))), # blur images with a sigma between 0 and 1.5
-	        rl(iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05), per_channel=0.5)), # add gaussian noise to images
-	        oc(iaa.Dropout((0.0, 0.10), per_channel=0.5)), # randomly remove up to X% of the pixels
-	        oc(iaa.CoarseDropout((0.0, 0.10), size_percent=(0.08, 0.2),per_channel=0.5)), # randomly remove up to X% of the pixels
+	        rl(iaa.GaussianBlur((0, 1.4))), # blur images with a sigma between 0 and 1.5
+	        rl(iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.09), per_channel=0.5)), # add gaussian noise to images
+	        oc(iaa.Dropout((0.0, 0.15), per_channel=0.5)), # randomly remove up to X% of the pixels
+	        st(iaa.CoarseDropout((0.0, 0.15), size_percent=(0.08, 0.2),per_channel=0.5)), # randomly remove up to X% of the pixels
 	        oc(iaa.Add((-40, 40), per_channel=0.5)), # change brightness of images (by -X to Y of original value)
-	        st(iaa.Multiply((0.10, 2.5), per_channel=0.2)), # change brightness of images (X-Y% of original value)
-	        rl(iaa.ContrastNormalization((0.5, 1.5), per_channel=0.5)), # improve or worsen the contrast
-	        rl(iaa.Grayscale((0.0, 1))), # put grayscale
+	        st(iaa.Multiply((0.10, 2.5), per_channel=0.4)), # change brightness of images (X-Y% of original value)
+	        oc(iaa.ContrastNormalization((0.5, 1.5), per_channel=0.5)), # improve or worsen the contrast
+	        oc(iaa.Grayscale((0.0, 1))), # put grayscale
 
 
 	        ],

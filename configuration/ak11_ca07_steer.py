@@ -1,5 +1,5 @@
-#this file trains for data from real world elektra data(steer only), implementing ak04_cf45_steer.py
-#dropout decreased in this experiment
+#this file trains for data from real world elektra data(steer only), implementing ak07_ca04_steer.py
+#dropout fraction decreased very low in this experiment
 
 import random
 
@@ -59,7 +59,7 @@ class configMain:
 
 		# a list of keep_prob corresponding to the list of layers:
 		# 8 conv layers, 2 img FC layer,  5 branches X 2 FC layers each
-		self.dropout = [0.85]*8 + [0.6]*2  + [0.6,0.6]*len(self.branch_config)
+		self.dropout = [0.9]*8 + [0.75]*2  + [0.75,0.75]*len(self.branch_config)
 
 
 		self.restore = True # This is if you want to restore a saved model
