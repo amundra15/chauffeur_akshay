@@ -1,4 +1,4 @@
-
+																																															
 import h5py
 import scipy
 import time
@@ -35,7 +35,7 @@ class Recorder(object):
 		self._image_size2 =image_size2
 		self._image_size1 = image_size1
 		self._record_image = record_image
-		self._number_rewards = 24			#27 when folder no, noise also taken
+		self._number_rewards = 24
 
 		if not os.path.exists(self._file_prefix):
 			os.mkdir(self._file_prefix)
@@ -145,7 +145,7 @@ class Recorder(object):
 		self.data_rewards[pos,5]  = action_noise.steer  
 		self.data_rewards[pos,6]  = action_noise.gas  
 		self.data_rewards[pos,7]  = action_noise.brake  
-		self.data_rewards[pos,8]  = rewards.player_x
+		self.data_rewards[pos,8]  = rewards.player_x	#location of car
 		self.data_rewards[pos,9]  = rewards.player_y
 		self.data_rewards[pos,10]  = rewards.speed
 		self.data_rewards[pos,11]  = rewards.collision_gen
@@ -165,6 +165,40 @@ class Recorder(object):
 		#self.data_rewards[pos,25]  = rewards.noise
 		#self.data_rewards[pos,26]  = folder_num
 		#print "GAS - >", self.data_rewards[pos,1]
+
+
+
+
+		'''#NOTE - Akshay: Virtual Elektra Data has been recorded using felipes code. the data points are as follows:
+		
+			self.data_rewards[pos,0]  = actions.steer  
+			self.data_rewards[pos,1]  = actions.throttle 
+			self.data_rewards[pos,2]  = actions.brake  
+			self.data_rewards[pos,3]  = actions.hand_brake  
+			self.data_rewards[pos,4]  = actions.reverse
+			self.data_rewards[pos,5]  = action_noise.steer  
+			self.data_rewards[pos,6]  = action_noise.throttle  
+			self.data_rewards[pos,7]  = action_noise.brake  
+			self.data_rewards[pos,8]  = measurements['PlayerMeasurements'].transform.location.x
+			self.data_rewards[pos,9]  = measurements['PlayerMeasurements'].transform.location.y
+			self.data_rewards[pos,10]  = measurements['PlayerMeasurements'].forward_speed
+			self.data_rewards[pos,11]  = measurements['PlayerMeasurements'].collision_other
+			self.data_rewards[pos,12]  = measurements['PlayerMeasurements'].collision_pedestrians
+			self.data_rewards[pos,13]  = measurements['PlayerMeasurements'].collision_vehicles
+			self.data_rewards[pos,14]  = measurements['PlayerMeasurements'].intersection_otherlane
+			self.data_rewards[pos,15]  = measurements['PlayerMeasurements'].intersection_offroad
+			self.data_rewards[pos,16]  = measurements['PlayerMeasurements'].acceleration.x
+			self.data_rewards[pos,17]  = measurements['PlayerMeasurements'].acceleration.y
+			self.data_rewards[pos,18]  = measurements['PlayerMeasurements'].acceleration.z
+			self.data_rewards[pos,19]  = measurements['WallTime']
+			self.data_rewards[pos,20]  = measurements['GameTime']
+			self.data_rewards[pos,21]  = measurements['PlayerMeasurements'].transform.orientation.x
+			self.data_rewards[pos,22]  = measurements['PlayerMeasurements'].transform.orientation.y
+			self.data_rewards[pos,23]  = measurements['PlayerMeasurements'].transform.orientation.z
+			self.data_rewards[pos,24]  = direction
+			self.data_rewards[pos,25]  = i
+			self.data_rewards[pos,26]  = float(self._camera_dict[i][1])'''
+
 
 
 

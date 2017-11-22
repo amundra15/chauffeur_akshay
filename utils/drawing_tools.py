@@ -2,7 +2,7 @@ from random import *
 import colorsys
 import pygame
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
 from skimage import transform as trans
@@ -156,7 +156,7 @@ def draw_bar_on(img,bar_intensity,y_pos,color=(0,0,255)):
 
 
 
-
+'''
 def grayify_cmap(cmap):
     """Return a grayscale version of the colormap"""
     cmap = plt.cm.get_cmap(cmap)
@@ -178,4 +178,4 @@ def grayscale_colormap(img,colormap):
 
   rgb_img = np.delete(rgba_img, 3, 2)
   return rgb_img
-
+'''

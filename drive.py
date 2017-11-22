@@ -98,7 +98,6 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 	direction = 2
 	old_speed = 0		#the speed we start the car with
 
-	machine_score = 0
 	iteration = 0
 	try:
 		while direction != -1:		#which never happens
@@ -152,9 +151,9 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 			if show_screen:
 				if game == "Carla":
 					#print len(image)
-					screen_manager.plot_driving_interface( capture_time,np.copy(image),\
+					screen_manager.plot_driving_interface(capture_time,np.copy(image),\
 						action,action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
-						drifting_time,will_drift,rewards.speed,new_speed,0,0,0) #
+						drifting_time,will_drift,rewards.speed,new_speed,0,0,0,type_of_driver, driver.continous_steer) #
 
 					'''#for 3 images
 					screen_manager.plot_driving_interface( capture_time,np.copy(image[0]),\
@@ -184,11 +183,6 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 					screen_manager.plot_driving_interface( capture_time,np.copy(image),	action,action_noisy,\
 						rewards.direction,recording and (drifting_time == 0.0 or  will_drift),drifting_time,will_drift\
 						,rewards.speed,0,0,None,rewards.reseted,driver.get_number_completions(),dist_to_goal,0) #
-			
-			if type_of_driver == "Machine":
-				current_score = get_score(current_location, current_inclination)
-				machine_score = machine_score + current_score
-
 
 
 			iteration +=1
@@ -202,5 +196,10 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 
 		#driver.write_performance_file(path,folder_name,iteration)
 		pygame.quit()
+
+		if type_of_driver == "Machine":
+			print "Machine score:", driver.score
+			driver.tester.plot_map()
+
 
 

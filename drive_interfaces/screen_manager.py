@@ -116,12 +116,6 @@ class  ScreenManager(object):
 
 		position = (0,0)
 
-		'''print array.shape[0]
-		print self._resolution[1]
-		print array.shape[1]
-		print self._resolution[0]'''
-
-
 		if array.shape[0] != self._resolution[1] or array.shape[1] != self._resolution[0]: 
 
 			array = scipy.misc.imresize(array,[self._resolution[1],self._resolution[0]])
@@ -145,21 +139,14 @@ class  ScreenManager(object):
 		pygame.display.flip()
 
 
-	def plot3camrc(self,capture_time,sensor_data,\
-		action,speed,orientation,\
-		screen_number=0):
+	def plot3camrc(self,capture_time,sensor_data,action,speed,orientation,screen_number=0,continous_steer=0):
 
 		start_to_print = time.time()
 		steer = action.steer
-		steer_noisy = action.steer
 		acc =action.gas
 		brake = action.brake
 		size_x,size_y,size_z = sensor_data.shape
 
-		# Define our fonts
-
-		#print '******in plot3camrc******'
-		#draw_path_on(img, 10, -angle_steers*40.0)
 		
 		draw_path_on(sensor_data, 20, -steer*20.0, (0, 255, 0))
 
@@ -168,66 +155,25 @@ class  ScreenManager(object):
 
 
 		self.set_array(sensor_data,screen_number)
-		#pygame.surfarray.blit_array(activation_surface, img_act)
-
-		#pygame.display.flip()
-
-		'''if direction ==1.:
-			text = "WRONG WAY ... Recalculating ..."
-		elif direction ==4:
-			text = "Right"
-		elif direction == 3:
-			text = "Left"
-		elif direction == 5:
-			text = "Straight"
-		elif direction == 6:
-			text = "6- UTurnLeft"
-		elif direction == 7:
-			text = "7 - Exit to the Right"
-		elif direction == 8:
-			text = "8 - Similar to 7"
-		elif direction == 9:
-			text = "9 - The misterious 9"
-		else:
-			text = 'Nothing
-
-		direction_color = (255,0,0)
-	
-		if ((self._render_iter)/10) % 2 != 0 and direction !=2.0:
-			direction_color = (0,255,0)
-
-		if direction == 2:
-			direction_pos = (0,10)
-		else:
-			direction_pos = (size_x/2 - 50,size_y/2 - 50)
-
-		self.paint_on_screen(size_x/20,text,direction_color,direction_pos,screen_number)'''
 
 		self.paint_line_screen(size_x/20,(255,0,0),[[size_x/2,100],\
 			[size_x/2 +10*orientation[0] ,100 +10*orientation[1]]],screen_number)
 
-	
-
-		#if speed > self._speed_limit:
-
-		#	self.paint_on_screen(size_x/10,'SLOW DOWN',(255,0,0),(size_x/2,100),screen_number)
+		self.paint_on_screen(size_x/20,"Speed: %.2f" % speed,(0,255,0),(size_x/2,30),screen_number)
 
 
-
-		self.paint_on_screen(size_x/20,"%.2f" % speed,(0,255,0),(size_x/2,30),screen_number)
-
+		self.paint_on_screen(size_x/20,"Cont. steer value: %.2f" % continous_steer,(0,255,0),(size_x/2,15),screen_number)
 
 
 		pygame.display.flip()
-
 
 		self._render_iter +=1
 
 
 	#speed is giver by carla, calc_speed is given by driver/network
 	def plot_driving_interface(self,capture_time,sensor_data,\
-		action,action_noisy,recording,drifting_time,will_drift,speed,calc_speed,posx,\
-		posy,screen_number=0):
+		action,action_noisy, recording,drifting_time,will_drift,speed,calc_speed,posx,\
+		posy,screen_number=0, type_of_driver = "Machine", continous_steer = 0):
 
 		start_to_print = time.time()
 		steer = action.steer
@@ -238,9 +184,9 @@ class  ScreenManager(object):
 		#a = sensor_data.shape
 		#print a
 		#print len(a)
-		'''no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
-		sensor_data = sensor_data[0]'''
-		size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
+		no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
+		sensor_data = sensor_data[0]
+		#size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
 		#Note: Depending upon the above two, include or not line 242
 
 
@@ -318,11 +264,19 @@ class  ScreenManager(object):
 			self.paint_on_screen(size_x/20,'NOISE',(255,0,0),(size_x/2 - 70,size_y/2 -70),screen_number)
 
 
+		if type_of_driver == "Machine":
+			#### NETWORK STEER(continous) PRINTED ON SCREEN HERE ####
+			self.paint_on_screen(size_x/20,"Steer from network: %.2f" % continous_steer,(0,255,0),(size_x/2 -30,0),screen_number)
+
+		#### NETWORK SPEED PRINTED ON SCREEN HERE ####
+		if type_of_driver == "Machine":
+			self.paint_on_screen(size_x/20,"speed from network: %.2f" % calc_speed,(0,255,0),(size_x/2 -30,30),screen_number)
+		if type_of_driver == "Human":
+			self.paint_on_screen(size_x/20,"speed from human driver: %.2f" % calc_speed,(0,255,0),(size_x/2 -30,30),screen_number)
+
 		#### CARLA SPEED PRINTED ON SCREEN HERE ####
 		self.paint_on_screen(size_x/20,"Carla speed: %.2f" % speed,(0,255,0),(size_x/2 -30,60),screen_number)
 
-		#### NETWORK SPEED PRINTED ON SCREEN HERE ####
-		self.paint_on_screen(size_x/20,"speed from driver/network: %.2f" % calc_speed,(0,255,0),(size_x/2 -30,30),screen_number)
 
 
 		pygame.display.flip()

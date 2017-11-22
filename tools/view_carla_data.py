@@ -54,9 +54,9 @@ if __name__ == "__main__":
   steering_pred =[]
   steering_gt =[]
 
-  positions_to_test = range(38) #total hdf5 files
+  positions_to_test = range(14,38) #total hdf5 files
 
-  path = '../Desktop/2_Akshay_6/'
+  path = '../VirtualElektraData2_onelap/'
 
 
   screen = ScreenManager()
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     
 
     # skip to highway
-    for i in range(0,200,25):   #every hdf5 files containg data for 200 images
+    for i in range(0,200):   #every hdf5 files containg data for 200 images
 
 
       #img = cam['X'][log['cam1_ptr'][i]].swapaxes(0,2).swapaxes(0,1)
@@ -99,76 +99,40 @@ if __name__ == "__main__":
 
       images =  np.array(data['rgb'][i]).astype(np.uint8)
 
+      camera_angle = data['targets'][i][26]
       actions.steer = data['targets'][i][0]
       actions.gas = data['targets'][i][1]
-      noisy_steer = data['targets'][i][5]
-
-      '''camera_angle = data['targets'][i][26]
-      car_angle = actions.steer * 20   #car_angle is steer angle wrt road in degrees. 20 is max possible steer in degrees
-      effective_angle = 4*camera_angle + car_angle
-      
-      print 'steer angle: ',actions.steer
-      print 'car_angle: ', car_angle
-      print 'camera angle: ', camera_angle
-      print 'effective angle: ', effective_angle'''
-      
-
-      '''if (effective_angle >= -7.5 and effective_angle <= 7.5):  #since cameras are at -15,0 and 15, central position would correspond to this
-        actions.steer = 0
-      elif effective_angle > 7.5:
-        actions.steer = -1.0
-      else:
-        actions.steer = 1.0'''
-
-      '''if actions.steer < 0.05 and actions.steer > -0.05:  #standard
-        if camera_angle < 0:
-          actions.steer = 1
-        elif camera_angle > 0:
-          actions.steer = -1
-          ########
-      elif actions.steer < 0.3 and actions.steer >= 0.05:
-        if camera_angle == -15:
-          actions.steer = 0
-        elif camera_angle < -15:
-          actions.steer = 1
-        else:
-          actions.steer = -1
-      elif actions.steer < 0.6 and actions.steer >= 0.3:
-        if camera_angle == -45:
-          actions.steer = 0
-        else:
-          actions.steer = 1
-      elif actions.steer >= 0.6:
-          actions.steer = 1
-          #######
-      elif actions.steer > -0.3 and actions.steer <= -0.05:
-        if camera_angle == 15:
-          actions.steer = 0
-        elif camera_angle < 15:
-          actions.steer = 1
-        else:
-          actions.steer = -1
-      elif actions.steer > -0.6 and actions.steer <= -0.3:
-        if camera_angle == 45:
-          actions.steer = 0
-        else:
-          actions.steer = 1
-      elif actions.steer <= -0.6:
-          actions.steer = -1
-
-      print 'steer on screen', actions.steer
-      print '****************************'''
-
-
+      noisy_steer = data['targets'][i][5] 
       speed = data['targets'][i][10]
+      continous_steer = actions.steer
+
+ 
+      time_use =  1.0
+      car_lenght = 6.0
+      extra_factor = 4.0
+      threshold = 0.3
+      if camera_angle > 0.0:
+        camera_angle = math.radians(math.fabs(camera_angle))
+        actions.steer -=min(extra_factor*(math.atan((camera_angle*car_lenght)/(time_use*speed+0.05)))/3.1415,0.6)
+      else:
+        camera_angle = math.radians(math.fabs(camera_angle))
+        actions.steer +=min(extra_factor*(math.atan((camera_angle*car_lenght)/(time_use*speed+0.05)))/3.1415,0.6)
+
+      if actions.steer > threshold:
+        actions.steer = 1
+      elif actions.steer < -threshold:
+        actions.steer = -1
+      else:
+        actions.steer  =0
+
 
       #plot on screen
-      screen.plot3camrc(0,images,actions,speed,[0,0],0) 
+      screen.plot3camrc(0,images,actions,speed,[0,0],0,continous_steer) 
 
       #print '***in view_carla_data****'
 
       
-      time.sleep(0.3) #to slow video down
+      time.sleep(0.6) #to slow video down
 
       steer_list.append((actions.steer))
       noisy_steer_list.append((noisy_steer))

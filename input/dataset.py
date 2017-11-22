@@ -313,9 +313,11 @@ class Dataset(object):
       sensors[i] =  np.array((sensors[i]))
 
       if self._config.sensor_names[i] == 'rgb':
+        #Augment images!!!
         if self._augmenter != None:     #i.e. it is not validation set
           sensors[i] = self._augmenter.augment_images(sensors[i])   #Applies general augmentation
           if self._config.augment_labels == True:
+            #augment as per labels
             augmenter_object = ImageAugmenter(self._config.labels_to_augment,self._config.augment_amount)
             sensors[i] = augmenter_object.augmenter_function(sensors[i],sensors[self._config.sensor_names.index('labels')])  #augmentation based on segmentation labels
 
@@ -330,17 +332,9 @@ class Dataset(object):
       targets.append(np.zeros((batch_size,self._config.targets_sizes[i])))
 
 
-    '''# Get the inputs
-    inputs = []
-    for i in range(len(self._config.inputs_names)):
-      inputs.append(np.zeros((batch_size,self._config.inputs_sizes[i])))'''
-
-
     for i in range(0,batch_size):
-
         for j in range(len(self._images)):
           sensors[j][i,:,:,:] = np.multiply(sensors[j][i,:,:,:],1.0 / 255.0)
-
 
         count =0
         for j in range(len(self._config.targets_names)):
@@ -351,7 +345,8 @@ class Dataset(object):
             targets[count][i]/=self._config.speed_factor'''
 
 
-          '''if hasattr(self._config, 'extra_augment_factor'):
+          '''#used for steering augmentation in continous domain
+          if hasattr(self._config, 'extra_augment_factor'):
             camera_pos = self._config.variable_names.index('Camera')
             speed_pos = self._config.variable_names.index('Speed')
 
@@ -361,54 +356,37 @@ class Dataset(object):
             #########Augmentation!!!!
             time_use =  1.0
             car_lenght = 6.0
-            targets[count][i] -=min(self._config.extra_augment_factor*(math.atan((angle*car_lenght)/(time_use*float_data[speed_pos,i]+0.05)))/3.1415,0.2)
-          if hasattr(self._config, 'saturated_factor'):
-            angle = float_data[self._config.variable_names.index('Angle'),i]
-            #print angle
-            #########Augmentation!!!!
-            if angle < 0.0:
+            targets[count][i] -=min(self._config.extra_augment_factor*(math.atan((angle*car_lenght)/(time_use*float_data[speed_pos,i]+0.05)))/3.1415,0.2)'''
 
-              targets[count][i] =1.0
-            elif angle >0.0:
-              targets[count][i] =-1.0'''
+
+          #used for steering augmentation in discrete domain
+          if hasattr(self._config, 'augment_and_saturate_factor') and self._config.targets_names[j] == "Steer":
+            camera_angle = float_data[self._config.variable_names.index('Angle'),i]
+            #steer = float_data['targets'][i][0]
+            noisy_steer = float_data[self._config.variable_names.index('Steer_N'),i] #we apply augmentation only to noisy_steer. in case no noise was added, both will be automatically same. 
+            speed = float_data[self._config.variable_names.index('Speed'),i]
+
+            time_use =  1.0
+            car_lenght = 6.0
+            extra_factor = 4.0
+            threshold = 0.3
+            if camera_angle > 0.0:
+              camera_angle = math.radians(math.fabs(camera_angle))
+              noisy_steer -=min(extra_factor*(math.atan((camera_angle*car_lenght)/(time_use*speed+0.05)))/3.1415,0.6)
+            else:
+              camera_angle = math.radians(math.fabs(camera_angle))
+              noisy_steer +=min(extra_factor*(math.atan((camera_angle*car_lenght)/(time_use*speed+0.05)))/3.1415,0.6)
+
+            #based on augmented value of noisy_steer, we saturate steer value
+            if noisy_steer > threshold:
+              targets[count][i] = 1
+            elif noisy_steer < -threshold:
+              targets[count][i] = -1
+            else:
+              targets[count][i]  =0
+
 
           count += 1
-
-
-        '''count =0
-        for j in range(len(self._config.inputs_names)):
-          k = self._config.variable_names.index(self._config.inputs_names[j])
-
-          if self._config.inputs_names[j] == "Control":
-         
-            inputs[count][i] = encode(float_data[k,i])
-
-
-          if self._config.inputs_names[j] == "Speed":
-            inputs[count][i] = float_data[k,i]/self._config.speed_factor
-
-          if self._config.inputs_names[j] == "Distance":
-            inputs[count][i] = check_distance(float_data[k,i])
-
-
-          if self._config.inputs_names[j] == "Goal":
-            module = math.sqrt(float_data[k,i]*float_data[k,i] + float_data[k+1,i]*float_data[k+1,i])
-            #print 'k ',k
-            #print 'module',module
-            #print 'float_data',float_data[k,i],float_data[k+1,i]
-            float_data[k,i] = float_data[k,i]/module
-            float_data[k+1,i] = float_data[k+1,i]/module
-
-            inputs[count][i] = float_data[k:k+2,i]
-
-
-
-
-          count += 1'''
-
-       
-
-
 
 
     #return images, targets,inputs

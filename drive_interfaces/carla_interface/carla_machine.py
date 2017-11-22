@@ -35,6 +35,9 @@ from drawing_tools import *
 import copy
 import random
 
+sys.path.append('test')
+from test_machine_performance import PerformanceTester
+
 Reward.noise = property(lambda self: 0)
 
 
@@ -107,6 +110,9 @@ class CarlaMachine(Runnable,Driver):
 
     cpkt = restore_session(self._sess,saver,self._config.models_path)
 
+    self.tester = PerformanceTester()
+    self.score = 0
+
 
 
 
@@ -125,7 +131,7 @@ class CarlaMachine(Runnable,Driver):
 
     self.carla.newEpisode(0,0)
 
-
+ 
   '''def _get_direction_buttons(self):
     #with suppress_stdout():if keys[K_LEFT]:
     keys=pygame.key.get_pressed()
@@ -184,7 +190,7 @@ class CarlaMachine(Runnable,Driver):
     return True
 
 
-  def run_step(self,data,target):
+  '''def run_step(self,data,target):
 
     rewards = data[0]
     sensor = data[2][0] #takes the first image
@@ -192,6 +198,10 @@ class CarlaMachine(Runnable,Driver):
 
     direction = self.compute_direction((rewards.player_x,rewards.player_y,22),(rewards.ori_x,rewards.ori_y,rewards.ori_z),(target[0],target[1],22),(1.0,0.02,-0.001))
     #will return 2
+
+    #update score based on current position, inclination
+    current_score = tester.evaluate(rewards.)
+    self.score = self.score + current_score
 
     """ Get Steering """
 
@@ -226,7 +236,7 @@ class CarlaMachine(Runnable,Driver):
     control.reverse = 0
 
 
-    return control
+    return control'''
 
   def compute_action(self,speed,rewards,sensor):
     self._old_speed = speed
@@ -251,12 +261,16 @@ class CarlaMachine(Runnable,Driver):
     image_input = np.multiply(image_input, 1.0 / 127.0)
 
 
-    steer,_new_speed = machine_output_functions.single_branch(image_input,self._config,self._sess,self._train_manager)
+    self.continous_steer, discrete_steer, _new_speed = machine_output_functions.single_branch(image_input,self._config,self._sess,self._train_manager)
 
+
+    #update score based on current position, inclination
+    current_score = self.tester.evaluate([rewards.player_x, rewards.player_y],[rewards.ori_x,rewards.ori_y,rewards.ori_z])
+    self.score = self.score + current_score
 
 
     control = Control()
-    control.steer = steer
+    control.steer = discrete_steer
     if(_new_speed - rewards.speed) > 0.05:
       control.gas = ((_new_speed - rewards.speed ) /2.5) + 0.4 # accl till carla speed nearly equal to actual speed. constant added to overcome friction
     else:

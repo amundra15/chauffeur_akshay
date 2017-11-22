@@ -123,7 +123,8 @@ def single_branch(image_input,config,sess,train_manager):
   for i in range(len(predicted_steers)):
     predicted_steers[i] = int(round(predicted_steers[i]))'''
 
-  predicted_steers = int(round(output_all[0][0][0]))
+  predicted_steers = output_all[0][0][0]
+  discrete_steers = int(round(predicted_steers))
   predicted_speed = 7   #(output_all[0][0][1])
   
 
@@ -132,7 +133,7 @@ def single_branch(image_input,config,sess,train_manager):
   #predicted_brake = (output_all[0][2])
       
   #return  predicted_steers,predicted_acc,predicted_brake
-  return  predicted_steers,predicted_speed
+  return  predicted_steers, discrete_steers, predicted_speed
 
 
 def single_branch_steer_only(image_input,config,sess,train_manager):

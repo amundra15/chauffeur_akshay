@@ -37,6 +37,7 @@ class CarlaHuman(Driver):
 		self.steering_direction = 0
 		self._new_speed = 0
 		self._augment_left_right = augment_left_right
+		self.continous_steer = 0	#something which is only needed for carla_machine. 
 
 		
 
