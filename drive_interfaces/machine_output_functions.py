@@ -203,90 +203,29 @@ def single_branch_steer_only(image_input,config,sess,train_manager):
   return  predicted_steers,predicted_speed
 
 
-def branched_speed_4cmd(image_input,speed,control_input,config,sess,train_manager):
+#taken from felipe's chauffeur
+def base_no_speed(image_input,speed,control_input,config,sess,train_manager):
 
   
   branches = train_manager._output_network
   x = train_manager._input_images 
   dout = train_manager._dout
-  input_speed = train_manager._input_data[config.inputs_names.index("Speed")]
-  input_control =  train_manager._input_data[config.inputs_names.index("Control")]
 
   image_input = image_input.reshape((1,config.image_size[0],config.image_size[1],config.image_size[2]))
 
-  speed = np.array(speed/config.speed_factor)
-
-  speed = speed.reshape((1,1))
-
-  if control_input ==5:
-    steer_net = branches[1]
-  elif control_input == 3 or control_input == 6:
-    steer_net = branches[2]
-  elif control_input == 4 or control_input == 7 or control_input == 8:
-    steer_net = branches[3]
-  else:
-    steer_net = branches[0]
-
-  acc_net = branches[4]
-  brake_net = branches[5]
-  speed_net = branches[6]  # This is hardcoded !!!!!!
-
-  #print clip_input.shape
-
-  #input_vec = input_vec.reshape((1,config.input_size[0]*config.input_size[1]*config.input_size[2]))
+  net = branches[0]
 
 
-  #image_result = Image.fromarray((scipy.misc.imresize(image_input[0],(210,280,3))).astype(np.uint8))
-      
-      
-  #image_result.save(str('saida_res.jpg'))
 
-  feedDict = {x: image_input,input_speed:speed,dout: [1]*len(config.dropout) }
+  feedDict = {x: image_input,dout: [1]*len(config.dropout) }
 
 
-  output_steer = sess.run(steer_net, feed_dict=feedDict)
-  output_acc = sess.run(acc_net, feed_dict=feedDict)
-  output_speed = sess.run(speed_net, feed_dict=feedDict)
-  output_brake = sess.run(brake_net, feed_dict=feedDict)
-
-
-  if config.use_speed_trick:
-    if speed < (4.0/config.speed_factor) and output_speed[0][0] > (4.0/config.speed_factor):  # If (Car Stooped) and ( It should not have stoped)
-     output_acc[0][0] =  0.3*(4.0/config.speed_factor -speed) + output_acc[0][0]  #print "DURATION"
-
+  output_net = sess.run(net, feed_dict=feedDict)
 
 
   
-  predicted_steers = (output_steer[0][0])
+  predicted_steers = (output_net[0][0])
 
-  predicted_acc = (output_acc[0][0])
-
-
-  predicted_brake = (output_brake[0][0])
       
-  return  predicted_steers,predicted_acc,predicted_brake
+  return  predicted_steers,None,None
 
-
-def vbp(image_input,speed,config,sess,train_manager):
-
-
-
-  branches = train_manager._output_network
-  x = train_manager._input_images 
-  dout = train_manager._dout
-  input_speed = train_manager._input_data[config.inputs_names.index("Speed")]
-
-  image_input = image_input.reshape((1,config.image_size[0],config.image_size[1],config.image_size[2]))
-
-  speed = np.array(speed/config.speed_factor)
-
-  speed = speed.reshape((1,1))
-
-  vbp_images_tensor = train_manager._vis_images
-
-  feedDict = {x: image_input,input_speed:speed,dout: [1]*len(config.dropout) }  
-
-  vbp_images = sess.run(vbp_images_tensor, feed_dict=feedDict)
-
-
-  return vbp_images[0]

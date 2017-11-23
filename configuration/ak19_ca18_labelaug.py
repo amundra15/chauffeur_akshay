@@ -1,6 +1,6 @@
 #this file trains for data from virtual world elektra data by human;steer only, implementing f01_ecf45_testsevencamera.py
 #single cam, therefore augment_and_saturate_factor = False
-#implements only general aug, no label wise
+#implements label wise augmentation
 import random
 
 import imgaug as ia
@@ -109,7 +109,7 @@ class configInput(configMain):
 	        ],
 		    random_order=True # do all of the above in random order
 		)
-		self.augment_labels = False
+		self.augment_labels = True
 		self.augment_amount = 1   #3=max, 2=mid, 1=min
 		self.labels_to_augment = {"road": True, "buildings": True, "grass": True, "sky_n_zebra": True }
 
@@ -161,7 +161,7 @@ class configInput(configMain):
 		# TODO NOT IMPLEMENTED Felipe: True/False switches to turn data balancing on or off
 		self.balances_val = True
 		self.balances_train = True
-		self.augment_and_saturate_factor = False
+		#self.augment_and_saturate_factor = False
 
 
 

@@ -184,9 +184,9 @@ class  ScreenManager(object):
 		#a = sensor_data.shape
 		#print a
 		#print len(a)
-		'''no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
-		sensor_data = sensor_data[0]'''
-		size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
+		o_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
+		sensor_data = sensor_data[0]
+		#size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
 		#Note: Depending upon the above two, include or not line 242
 
 

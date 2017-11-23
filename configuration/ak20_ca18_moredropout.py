@@ -1,6 +1,7 @@
-#this file trains for data from virtual world elektra data by human;steer only, implementing f01_ecf45_testsevencamera.py
+#this file trains for data from virtual world elektra data by human;steer only, implementing ak18_cf45_steer
 #single cam, therefore augment_and_saturate_factor = False
 #implements only general aug, no label wise
+#dropout increased in this exp
 import random
 
 import imgaug as ia
@@ -59,7 +60,7 @@ class configMain:
 
 		# a list of keep_prob corresponding to the list of layers:
 		# 8 conv layers, 2 img FC layer,  5 branches X 2 FC layers each
-		self.dropout = [0.8]*8 + [0.5]*2  + [0.5,.5]*len(self.branch_config)
+		self.dropout = [0.9]*3 + [0.75]*2 + [0.6]*3 + [0.5]*2  + [0.5,0.5]*len(self.branch_config)
 
 
 		self.restore = True # This is if you want to restore a saved model
@@ -161,7 +162,7 @@ class configInput(configMain):
 		# TODO NOT IMPLEMENTED Felipe: True/False switches to turn data balancing on or off
 		self.balances_val = True
 		self.balances_train = True
-		self.augment_and_saturate_factor = False
+		#self.augment_and_saturate_factor = False
 
 
 

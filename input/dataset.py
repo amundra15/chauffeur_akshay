@@ -359,11 +359,12 @@ class Dataset(object):
             targets[count][i] -=min(self._config.extra_augment_factor*(math.atan((angle*car_lenght)/(time_use*float_data[speed_pos,i]+0.05)))/3.1415,0.2)'''
 
 
+
+            #check this augmentation using view_carla_data.py before using it
           #used for steering augmentation(when multiple cameras used) in discrete domain
-          if hasattr(self._config, 'augment_and_saturate_factor') and self._config.targets_names[j] == "Steer":
+          '''if hasattr(self._config, 'augment_and_saturate_factor') and self._config.targets_names[j] == "Steer":
             camera_angle = float_data[self._config.variable_names.index('Angle'),i]
-            #steer = float_data['targets'][i][0]
-            noisy_steer = float_data[self._config.variable_names.index('Steer_N'),i] #we apply augmentation only to noisy_steer. in case no noise was added, both will be automatically same. 
+            steer = float_data['targets'][i][0]
             speed = float_data[self._config.variable_names.index('Speed'),i]
 
             time_use =  1.0
@@ -372,18 +373,18 @@ class Dataset(object):
             threshold = 0.3
             if camera_angle > 0.0:
               camera_angle = math.radians(math.fabs(camera_angle))
-              noisy_steer -=min(extra_factor*(math.atan((camera_angle*car_lenght)/(time_use*speed+0.05)))/3.1415,0.6)
+              steer -=min(extra_factor*(math.atan((camera_angle*car_lenght)/(time_use*speed+0.05)))/3.1415,0.6)
             else:
               camera_angle = math.radians(math.fabs(camera_angle))
-              noisy_steer +=min(extra_factor*(math.atan((camera_angle*car_lenght)/(time_use*speed+0.05)))/3.1415,0.6)
+              steer +=min(extra_factor*(math.atan((camera_angle*car_lenght)/(time_use*speed+0.05)))/3.1415,0.6)
 
-            #based on augmented value of noisy_steer, we saturate steer value
-            if noisy_steer > threshold:
+            #based on augmented value of steer, we saturate steer value
+            if steer > threshold:
               targets[count][i] = 1
-            elif noisy_steer < -threshold:
+            elif steer < -threshold:
               targets[count][i] = -1
             else:
-              targets[count][i]  =0
+              targets[count][i]  =0'''
 
 
           count += 1

@@ -79,9 +79,9 @@ class Recorder(object):
 		return hf
 
 	#folder num to store images from diff cameras in different folders
-	def record(self,images,rewards,action,action_noise,folder_num):	
+	def record(self,images,rewards,action,action_noise):	
 
-		self._data_queue.put([images,rewards,action,action_noise,folder_num])
+		self._data_queue.put([images,rewards,action,action_noise])
 
 
 	@threaded

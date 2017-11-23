@@ -167,48 +167,95 @@ class ImageAugmenter(object):
 
 
 
-        grass = np.zeros_like(images)
-        cond = labels == 9
-        b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
-        grass[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
-
-        fence = np.zeros_like(images)
+        '''fence = np.zeros_like(images)
         cond = labels == 2
         b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
-        fence[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
-
-        buildings = np.zeros_like(images)
-        cond = labels == 1
-        b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
-        buildings[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
-
-        road = np.zeros_like(images)
-        cond = labels == 8 
-        b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
-        road[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
-
-        sky_n_zebra = np.zeros_like(images)
-        cond = labels == 0
-        b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
-        sky_n_zebra[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
+        fence[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]'''
 
 
         if self._labels_to_augment["road"] == True:
-            road = road_aug.augment_images(road)
+            road = np.zeros_like(images)
+            cond = labels == 8
+            b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
+            road[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
+
+            new_road = sky_aug.augment_images(road)
+
+            images = images + new_road - road
+
 
         if self._labels_to_augment["buildings"] == True:
-            buildings = building_aug.augment_images(buildings)
+            buildings = np.zeros_like(images)
+            cond = labels == 1
+            b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
+            buildings[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
+
+            new_buildings = sky_aug.augment_images(buildings)
+
+            images = images + new_buildings - buildings
+
 
         if self._labels_to_augment["grass"] == True:
-            grass = grass_aug.augment_images(grass)
+            grass = np.zeros_like(images)
+            cond = labels == 9
+            b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
+            grass[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
+
+            new_grass = sky_aug.augment_images(grass)
+
+            images = images + new_grass - grass
+
 
         if self._labels_to_augment["sky_n_zebra"] == True:
-            sky_n_zebra = sky_aug.augment_images(sky_n_zebra)
 
-        final = road + buildings + grass + sky_n_zebra + fence
+            sky_n_zebra = np.zeros_like(images)
+            cond = labels == 0
+            b = np.repeat(cond[:, :, :, np.newaxis], 3, axis=3)
+            sky_n_zebra[b[:,:,:,:,0]] = images[b[:,:,:,:,0]]
+
+            new_sky_n_zebra = sky_aug.augment_images(sky_n_zebra)
+
+            images = images + new_sky_n_zebra - sky_n_zebra
+
+        #final = road + buildings + grass + sky_n_zebra + fence
         #comp = np.hstack((initial,final))
 
         #initial = buildings+grass+fence+road+sky_n_zebra
 
-        return final
+        return images
 
+
+
+if __name__ == '__main__':
+
+    import h5py
+    import cv2
+    import numpy as np
+
+
+    filename = 'data_00020.h5'
+    f = h5py.File(filename, 'r')
+
+    seg_image = []
+    rgb_image = []
+
+    segmented_data = f["labels"]
+    rgb_data = f["rgb"]
+    #print len(segmented_data)
+    #print len(rgb_data)
+    seg_image.append(segmented_data)
+    rgb_image.append(rgb_data)
+    final_seg_image = np.array(seg_image[0])
+    final_rgb_image = np.array(rgb_image[0])
+
+    augment_labels = {"road": True, "buildings": True, "grass": True , "sky_n_zebra": True }
+    #augment_labels = {"road": False, "buildings": False, "grass": False, "sky_n_zebra": False }
+
+    #print augment_labels["road"]
+    augmenter_object = ImageAugmenter(augment_labels,2)
+    result = augmenter_object.augmenter_function(final_rgb_image,final_seg_image)  #augmentation based on segmentation labels
+
+    image = result[189]
+    cv2.imshow('image', image )
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
