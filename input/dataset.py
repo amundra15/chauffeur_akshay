@@ -359,7 +359,7 @@ class Dataset(object):
             targets[count][i] -=min(self._config.extra_augment_factor*(math.atan((angle*car_lenght)/(time_use*float_data[speed_pos,i]+0.05)))/3.1415,0.2)'''
 
 
-          #used for steering augmentation in discrete domain
+          #used for steering augmentation(when multiple cameras used) in discrete domain
           if hasattr(self._config, 'augment_and_saturate_factor') and self._config.targets_names[j] == "Steer":
             camera_angle = float_data[self._config.variable_names.index('Angle'),i]
             #steer = float_data['targets'][i][0]

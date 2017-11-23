@@ -1,4 +1,4 @@
-
+#trying to design loss function for steering as classification problem
 
 
 #def mse_branched(network_outputs,ground_truths,control_input,config):

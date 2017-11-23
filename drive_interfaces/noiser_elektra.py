@@ -1,3 +1,5 @@
+#used only for real cars
+
 import time
 import random
 #from carla_unreal import *

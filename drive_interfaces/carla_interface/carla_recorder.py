@@ -1,4 +1,3 @@
-																																															
 import h5py
 import scipy
 import time
@@ -25,7 +24,7 @@ class Recorder(object):
 	# We assume a three camera case not many cameras per input ....
 
 
-	def __init__(self,file_prefix,image_size2,image_size1,current_file_number=0,record_image=False,number_of_images=3):
+	def __init__(self,file_prefix,image_size2,image_size1,current_file_number=0,record_image=True,number_of_images=3):
 
 
 		self._number_of_images = number_of_images
@@ -36,6 +35,8 @@ class Recorder(object):
 		self._image_size1 = image_size1
 		self._record_image = record_image
 		self._number_rewards = 24
+
+		self._image_cut = [65,265]
 
 		if not os.path.exists(self._file_prefix):
 			os.mkdir(self._file_prefix)
@@ -69,22 +70,18 @@ class Recorder(object):
 	def _create_new_db(self):
 
 		hf = h5py.File( self._file_prefix +'data_'+ str(self._current_file_number).zfill(5) +'.h5', 'w')
-		self.data_center= hf.create_dataset('rgb', (self._number_images_per_file,self._image_size2,self._image_size1,3),dtype=np.uint8)
+		self.image_center= hf.create_dataset('rgb', (self._number_images_per_file,self._image_size2,self._image_size1,3),dtype=np.uint8)
+		#self.label_center= hf.create_dataset('labels', (self._number_images_per_file,self._image_size2,self._image_size1,3),dtype=np.uint8)
 		#data_right= hf.create_dataset('images_right', (max_number_images_per_file,image_size2,image_size1,3),'f')
 		self.data_rewards  = hf.create_dataset('targets', (self._number_images_per_file, self._number_rewards),'f')
 
 
 		return hf
 
-	'''#folder num to store images from diff cameras in different folders
+	#folder num to store images from diff cameras in different folders
 	def record(self,images,rewards,action,action_noise,folder_num):	
 
-		self._data_queue.put([images,rewards,action,action_noise,folder_num])'''
-	def record(self,images,rewards,action,action_noise):	
-
-		self._data_queue.put([images,rewards,action,action_noise])	
-
-
+		self._data_queue.put([images,rewards,action,action_noise,folder_num])
 
 
 	@threaded
@@ -109,7 +106,7 @@ class Recorder(object):
 
 
 
-		image  = data[0]
+		image  = data[0][0]
 		rewards = data[1]
 		action = data[2]
 		action_noise = data[3]
@@ -132,10 +129,12 @@ class Recorder(object):
 
 
 		if self._record_image_hdf5:
-			image = image[0][65:265,:,:]	#hard code to resize image to 200,100,3
+			
+
+			image = image[self._image_cut[0]:self._image_cut[1],:,:]	#hard code to resize image to 200,100,3
 			image = scipy.misc.imresize(image,[self._image_size2,self._image_size1])
-			self.data_center[pos] = image
-		
+			self.image_center[pos] = image
+
 
 		self.data_rewards[pos,0]  = action.steer  
 		self.data_rewards[pos,1]  = action.gas 

@@ -184,9 +184,9 @@ class  ScreenManager(object):
 		#a = sensor_data.shape
 		#print a
 		#print len(a)
-		no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
-		sensor_data = sensor_data[0]
-		#size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
+		'''no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
+		sensor_data = sensor_data[0]'''
+		size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
 		#Note: Depending upon the above two, include or not line 242
 
 
@@ -212,47 +212,6 @@ class  ScreenManager(object):
 
 
 		self.set_array(sensor_data,screen_number)
-		#pygame.surfarray.blit_array(activation_surface, img_act)
-
-		#pygame.display.flip()
-
-		'''if direction ==1.:
-			text = "WRONG WAY ... Recalculating ..."
-		elif direction ==4:
-			text = "Right"
-		elif direction == 3:
-			text = "Left"
-		elif direction == 5:
-			text = "Straight"
-		elif direction == 6:
-			text = "6- UTurnLeft"
-		elif direction == 7:
-			text = "7 - Exit to the Right"
-		elif direction == 8:
-			text = "8 - Similar to 7"
-		elif direction == 9:
-			text = "9 - The misterious 9"
-		else:
-			text = 'Nothing'
-
-		direction_color = (255,0,0)
-	
-		if ((self._render_iter)/10) % 2 != 0 and direction !=2.0:
-			direction_color = (0,255,0)
-
-		if direction == 2:
-			direction_pos = (0,10)
-		else:
-			direction_pos = (size_x/2 - 50,size_y/2 - 50)
-
-		self.paint_on_screen(size_x/20,text,direction_color,direction_pos,screen_number)'''
-
-
-
-		#if speed > self._speed_limit:
-
-		#	self.paint_on_screen(size_x/10,'SLOW DOWN',(255,0,0),(size_x/2,100),screen_number)
-
 
 		if recording:
 

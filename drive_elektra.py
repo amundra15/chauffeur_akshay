@@ -57,8 +57,8 @@ def get_instance(drive_config,experiment_name,drivers_name,memory_use,input_meth
 
 
 	if drivers_name is not None:
-		folder_name = str(datetime.datetime.today().day) +'_'+drivers_name
-		folder_name += '_'+ str(get_latest_file_number(drive_config.path,folder_name))
+		folder_name = 'Elektra_' + type_of_driver + '_' + str(datetime.datetime.today().day) 	#+'_'+drivers_name
+		folder_name += '_' + str(get_latest_file_number(drive_config.path,folder_name))
 		recorder = Recorder(drive_config.path + folder_name +'/',88,200,image_cut= drive_config.image_cut)
 	else:
 
@@ -123,20 +123,6 @@ def drive_elektra(experiment_name,drive_config,input_method,name = None,memory_u
 							action[i],action_noisy,driver.compute_direction((rewards.player_x,rewards.player_y,22),(rewards.ori_x,rewards.ori_y,rewards.ori_z)),recording and (drifting_time == 0.0 or  will_drift),\
 							drifting_time,will_drift,rewards.speed,0,0,i) #
 
-				elif drive_config.interface == "GTA":
-
-					dist_to_goal = math.sqrt(( rewards.goal[0]- rewards.position[0]) *(rewards.goal[0] - rewards.position[0]) + (rewards.goal[1] - rewards.position[1]) *(rewards.goal[1] - rewards.position[1]))
-					
-					image = image[:, :, ::-1]
-					screen_manager.plot_driving_interface( capture_time,np.copy(images),	action,action_noisy,\
-						rewards.direction,recording and (drifting_time == 0.0 or  will_drift),drifting_time,will_drift\
-						,rewards.speed,0,0,None,rewards.reseted,driver.get_number_completions(),dist_to_goal,0) #
-
-				elif drive_config.interface == "DeepRC":
-					for key,value in drive_config.cameras_to_plot.iteritems():
-						screen_manager.plot_driving_interface( capture_time,np.copy(images[key]),\
-							action[key],action_noisy,rewards.direction,recording and (drifting_time == 0.0 or  will_drift),\
-							drifting_time,will_drift,rewards.speed,0,0,value) #
 				else:
 					print "Not supported interface"
 					pass

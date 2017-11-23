@@ -61,14 +61,8 @@ class CarlaHuman(Driver):
 		if use_planner:
 			self.planner = Planner(graph_file,map_file)
 
-		#except:
-		#	print 'ERROR: Failed to connect to DrivingServer'
-		#else:
-		#	print 'Successfully connected to DrivingServer'
 
-		# Now start the joystick, the actual controller 
-
-		
+	
 		joystick_count = pygame.joystick.get_count()
 		print 'joystick count: ',joystick_count
 		if joystick_count >1:
@@ -80,52 +74,12 @@ class CarlaHuman(Driver):
 		self.joystick = pygame.joystick.Joystick(0)
 		self.joystick.init()
 
-	'''#direction is when you or planner gives an indicator for a turn
-		def _get_direction_buttons(self):
-		#with suppress_stdout():
-		if( self.joystick.get_button( 6)):
-			
-			self._left_button = False		
-			self._right_button = False
-			self._straight_button = False
 
-		if( self.joystick.get_button( 5 )):
-			
-			self._left_button = True		
-			self._right_button = False
-			self._straight_button = False
-
-
-		if( self.joystick.get_button( 4 )):
-			self._right_button = True
-			self._left_button = False
-			self._straight_button = False
-
-		if( self.joystick.get_button( 7 )):
-
-			self._straight_button = True
-			self._left_button = False
-			self._right_button = False
-
-			 	
-	 	return [self._left_button,self._right_button,self._straight_button]'''
 
 	def compute_direction_joystick(self,pos,ori,goal_pos,goal_ori):  
 		
 		return 2	#always return 2 cos splitting on the basis of direction as well. and this will basically overcome that.
 
-
-		# BUtton 3 has priority
-
-		'''button_vec = self._get_direction_buttons()
-		if sum(button_vec) == 0: # Nothing
-			return 2
-		elif button_vec[0] == True: # Left
-			return 3
-		elif button_vec[1] == True: # RIght
-			return 4
-		else:
-			return 5'''
 
 	def get_recording(self):
 		if( self.joystick.get_button( 2 )):
@@ -226,17 +180,10 @@ class CarlaHuman(Driver):
 		message = self.carla.getReward()
 		data = message[0]
 		images = message[2][0]
+		print visual_data[1].shape
 
 		pos = [data.player_x,data.player_y,22 ]
 		ori = [data.ori_x,data.ori_y,data.ori_z ]
-		'''if self.use_planner:
-
-			direction = self.planner.get_next_command(pos,ori,goal_pos,goal_ori)
-
-		else:
-			direction = 2.0'''
-
-
 
 		direction = 2.0
 

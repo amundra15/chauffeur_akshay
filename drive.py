@@ -68,22 +68,10 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 			from virtual_elektra_carla_machine import VirtualElektraMachine
 			driver = VirtualElektraMachine("0",experiment_name,drive_config,memory_use)'''
 
-	'''else:
-		from gta_recorder import Recorder
-		if type_of_driver == "Human":
-			from gta_human import GTAHuman
-			driver = GTAHuman()
-		else:
-			from gta_machine import GTAMachine
-			driver = GTAMachine("0",experiment_name)'''
-
-		#gta_surface = get_gta_map_surface((800,600))
-	# Instance the environemnt
-
 	noiser = Noiser(noise_type)
+
 	print host
 	print port
-
 
 	driver.start(host,port,config_path,resolution)
 	first_time = True
@@ -91,8 +79,8 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 		screen_manager.start_screen(resolution,3,2)
 
 
-	folder_name = str(datetime.datetime.today().day) +'_'+drivers_name
-	folder_name += '_'+ str(get_latest_file_number(path,folder_name))
+	folder_name = 'Carla_' + type_of_driver + '_' + str(datetime.datetime.today().day) # +'_' + drivers_name
+	folder_name += '_' + str(get_latest_file_number(path,folder_name))
 	recorder = Recorder(path + folder_name +'/',88,200)
 	#Note: resolution size is 400,300. but we give input to network 200,100 by cropping it.
 	direction = 2
@@ -103,22 +91,8 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 		while direction != -1:		#which never happens
 			capture_time  = time.time()
 			direction_time = time.time()
-			rewards,image = driver.get_sensor_data() # Later it would return more image like [rewards,images,segmentation]
-			'''print '**********'
-			print len(image[0])
-			print len(image[1])
-			print len(image[2])
-			print len(image[1][0])
-			print len(image[1][1])
-			print len(image[1][2])
-			print len(image[1][3])
-			print len(image[0][0])
-			print len(image[2][0])'''
-			#sensor_data = frame2numpy(image,[800,600])
+			rewards,image = driver.get_sensor_data()
 
-
-			
-			# Compute now the direction
 			
 			for event in pygame.event.get(): # User did something
 				if event.type == pygame.QUIT: # If user clicked close
@@ -139,14 +113,6 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 				recorder.record(image,rewards,action,action_noisy)
 
 
-			'''#only for 3 images, i.e. augmented version
-			if recording:
-				for i in range(len(image)):
-					recorder.record(image[i],rewards,actions[i],action_noisy,i)'''
-
-			#print "RECORDING ? ",recording and not exist_noise
-
-
 
 			if show_screen:
 				if game == "Carla":
@@ -155,27 +121,6 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 						action,action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
 						drifting_time,will_drift,rewards.speed,new_speed,0,0,0,type_of_driver, driver.continous_steer) #
 
-					'''#for 3 images
-					screen_manager.plot_driving_interface( capture_time,np.copy(image[0]),\
-						actions[0],action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
-						drifting_time,will_drift,rewards.speed,new_speed,0,0,0) #
-					screen_manager.plot_driving_interface( capture_time,np.copy(image[1]),\
-						actions[1],action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
-						drifting_time,will_drift,rewards.speed,new_speed,0,0,1) 
-					screen_manager.plot_driving_interface( capture_time,np.copy(image[2]),\
-						actions[2],action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
-						drifting_time,will_drift,rewards.speed,new_speed,0,0,2) '''
-
-
-					'''screen_manager.plot_driving_interface( capture_time,np.copy(image[0]),\
-						actions[0],action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
-						drifting_time,will_drift,rewards.speed,0,0,0) #
-					screen_manager.plot_driving_interface( capture_time,np.copy(image[1]),\
-						actions[1],action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
-						drifting_time,will_drift,rewards.speed,0,0,1) 
-					screen_manager.plot_driving_interface( capture_time,np.copy(image[2]),\
-						actions[2],action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
-						drifting_time,will_drift,rewards.speed,0,0,2) '''
 				else:
 					dist_to_goal = math.sqrt(( rewards.goal[0]- rewards.position[0]) *(rewards.goal[0] - rewards.position[0]) + (rewards.goal[1] - rewards.position[1]) *(rewards.goal[1] - rewards.position[1]))
 					

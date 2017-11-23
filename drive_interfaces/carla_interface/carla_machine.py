@@ -67,11 +67,6 @@ def load_system(config):
   training_manager.build_network()
 
 
-  """ Initializing Session as variables that control the session """
-  
-
-
-
   return training_manager
 
 
@@ -165,26 +160,7 @@ class CarlaMachine(Runnable,Driver):
 
   def compute_direction(self,pos,ori,goal_pos,goal_ori):  # This should have maybe some global position... GPS stuff
     return 2    #always return 2 cos splitting on the basis of direction as well. and this will basically overcome that.
-    '''if self.use_planner:
-
-      return self.planner.get_next_command(pos,ori,goal_pos,goal_ori)
-
-    else:
-      # BUtton 3 has priority
-      if 'Control' not in set(self._config.inputs_names):
-        return None
-
-      button_vec = self._get_direction_buttons()
-      if sum(button_vec) == 0: # Nothing
-        return 2
-      elif button_vec[0] == True: # Left
-        return 3
-      elif button_vec[1] == True: # RIght
-        return 4
-      else:
-        return 5'''
-
-    
+ 
 
   def get_recording(self):
     return True
