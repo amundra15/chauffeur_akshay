@@ -1,9 +1,8 @@
-#import h5py
-#import cv2
 import numpy as np
 import imgaug as ia
 from imgaug import augmenters as iaa
 
+#ia.seed(354)
 
 class ImageAugmenter(object):
 
@@ -21,33 +20,33 @@ class ImageAugmenter(object):
 
         if(self._augment_amount == 3):      #max augmentation
             road_aug = iaa.Sequential([
-                high(iaa.Multiply((0.5, 1.25))),
+                iaa.Multiply((0.5, 1.25)),        
                 #texture
                 iaa.SomeOf(1 , [
                 #iaa.AdditiveGaussianNoise(scale=(0, 0.01*255)),
-                high(iaa.AddElementwise((-10, 10))),
+                iaa.AddElementwise((-20, 20)),
                 medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
                 medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
             ])])
 
             building_aug = iaa.Sequential([
-                high(iaa.Multiply((0.5, 1.5), per_channel=0.8)),
+                iaa.Multiply((0.5, 1.5), per_channel=0.8),
                 #texture
-                iaa.SomeOf(1, [
-                high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
-                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
-                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
-            ])])
+                #iaa.SomeOf(1, [
+                #high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
+                #medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                #medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))])
+            ])
 
             grass_aug = iaa.Sequential([
                 iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
                 (iaa.WithChannels(0, iaa.Add((50, -50)))),
-                high(iaa.WithChannels(2, iaa.Add((-30,30)))),
+                iaa.WithChannels(2, iaa.Add((-30,30))),
                 iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
                 #texture
                 iaa.SomeOf(2, [
-                medium(iaa.AdditiveGaussianNoise(scale=(0, 0.05*255))),
-                medium(iaa.AddElementwise((-50, 50))),
+                medium(iaa.AdditiveGaussianNoise(scale=(0, 0.06*255))),
+                medium(iaa.AddElementwise((-25, 25))),
                 medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
                 medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
                 #low(iaa.Superpixels(p_replace=1, n_segments=(126, 128)))
@@ -55,17 +54,17 @@ class ImageAugmenter(object):
 
             sky_aug = iaa.Sequential([
                 iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
-                high(iaa.WithChannels(0, iaa.Add((-20, 20)))),
-                high(iaa.WithChannels(1, iaa.Add((0, 30)))),
-                high(iaa.WithChannels(2, iaa.Add((-10,0)))),
+                iaa.WithChannels(0, iaa.Add((-20, 20))),
+                iaa.WithChannels(1, iaa.Add((0, 30))),
+                iaa.WithChannels(2, iaa.Add((-10,0))),
                 iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
-                medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
+                #medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
                 #texture
-                iaa.SomeOf(1, [
-                medium(iaa.AddElementwise((-5, 5))),
-                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
-                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))
-            ])])
+                #iaa.SomeOf(1, [
+                #medium(iaa.AddElementwise((-5, 5))),
+                #medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))])
+            ])
 
 
         elif(self._augment_amount == 2):         #mid augmentation
@@ -74,29 +73,29 @@ class ImageAugmenter(object):
                 #texture
                 iaa.SomeOf(1 , [
                 #iaa.AdditiveGaussianNoise(scale=(0, 0.01*255)),
-                high(iaa.AddElementwise((-6, 6))),
+                iaa.AddElementwise((-8, 8)),
                 medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
                 medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
             ])])
 
             building_aug = iaa.Sequential([
-                high(iaa.Multiply((0.5, 1.5), per_channel=0.8)),
+                iaa.Multiply((0.5, 1.5), per_channel=0.8),
                 #texture
-                iaa.SomeOf(1, [
-                high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
-                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
-                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
-            ])])
+                #iaa.SomeOf(1, [
+                #high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
+                #medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                #medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))])
+            ])
 
             grass_aug = iaa.Sequential([
                 iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
                 (iaa.WithChannels(0, iaa.Add((50, -50)))),
-                high(iaa.WithChannels(2, iaa.Add((-30,30)))),
+                iaa.WithChannels(2, iaa.Add((-30,30))),
                 iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
                 #texture
-                iaa.SomeOf(2, [
+                iaa.SomeOf(1, [
                 medium(iaa.AdditiveGaussianNoise(scale=(0, 0.04*255))),
-                medium(iaa.AddElementwise((-30, 30))),
+                medium(iaa.AddElementwise((-11, 11))),
                 medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
                 medium(iaa.Emboss(alpha=(0.0, 0.75), strength=(0.5, 1.5)))
                 #low(iaa.Superpixels(p_replace=1, n_segments=(126, 128)))
@@ -104,17 +103,17 @@ class ImageAugmenter(object):
 
             sky_aug = iaa.Sequential([
                 iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
-                high(iaa.WithChannels(0, iaa.Add((-30, 30)))),
-                high(iaa.WithChannels(1, iaa.Add((0, 30)))),
-                high(iaa.WithChannels(2, iaa.Add((-10,0)))),
+                iaa.WithChannels(0, iaa.Add((-30, 30))),
+                iaa.WithChannels(1, iaa.Add((0, 30))),
+                iaa.WithChannels(2, iaa.Add((-10,0))),
                 iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
-                medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
+                #medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
                 #texture
-                iaa.SomeOf(1, [
-                medium(iaa.AddElementwise((-5, 5))),
-                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
-                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))
-            ])])
+                #iaa.SomeOf(1, [
+                #medium(iaa.AddElementwise((-5, 5))),
+                #medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))])
+            ])
 
 
         elif(self._augment_amount == 1):         #min augmentation
@@ -123,27 +122,27 @@ class ImageAugmenter(object):
                 #texture
                 iaa.SomeOf(1 , [
                 #iaa.AdditiveGaussianNoise(scale=(0, 0.01*255)),
-                high(iaa.AddElementwise((-3, 3))),
+                iaa.AddElementwise((-3, 3)),
                 medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
                 medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.8, 1.2)))
             ])])
 
             building_aug = iaa.Sequential([
-                high(iaa.Multiply((0.5, 1.5), per_channel=0.8)),
+                iaa.Multiply((0.5, 1.5), per_channel=0.8),
                 #texture
-                iaa.SomeOf(1, [
-                high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
-                medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
-                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))
-            ])])
+                #iaa.SomeOf(1, [
+                #high(iaa.AdditiveGaussianNoise(scale=(0, 0.03*255))),
+                #medium(iaa.Sharpen(alpha=(0.0, 1.0), lightness=1)),
+                #medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.5, 1.5)))])
+            ])
 
             grass_aug = iaa.Sequential([
                 iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
-                (iaa.WithChannels(0, iaa.Add((50, -50)))),
-                high(iaa.WithChannels(2, iaa.Add((-30,30)))),
+                iaa.WithChannels(0, iaa.Add((50, -50))),
+                iaa.WithChannels(2, iaa.Add((-30,30))),
                 iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
                 #texture
-                iaa.SomeOf(2, [
+                iaa.SomeOf(1, [
                 medium(iaa.AdditiveGaussianNoise(scale=(0, 0.02*255))),
                 medium(iaa.AddElementwise((-10, 10))),
                 medium(iaa.Sharpen(alpha=(0.0, 0.5), lightness=1)),
@@ -153,18 +152,17 @@ class ImageAugmenter(object):
 
             sky_aug = iaa.Sequential([
                 iaa.ChangeColorspace(from_colorspace="RGB", to_colorspace="HSV"),
-                high(iaa.WithChannels(0, iaa.Add((-20, 20)))),
-                high(iaa.WithChannels(1, iaa.Add((0, 10)))),
-                high(iaa.WithChannels(2, iaa.Add((-10,0)))),
+                iaa.WithChannels(0, iaa.Add((-20, 20))),
+                iaa.WithChannels(1, iaa.Add((0, 10))),
+                iaa.WithChannels(2, iaa.Add((-10,0))),
                 iaa.ChangeColorspace(from_colorspace="HSV", to_colorspace="RGB"),
                 medium(iaa.WithChannels(2, iaa.Add((-40, 40)))),
                 #texture
-                iaa.SomeOf(1, [
-                medium(iaa.AddElementwise((-5, 5))),
-                medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
-                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))
-            ])])
-
+                #iaa.SomeOf(1, [
+                #medium(iaa.AddElementwise((-5, 5))),
+                #medium(iaa.Emboss(alpha=(0.0, 1.0), strength=(0.6, 1.4)))
+                #low(iaa.Superpixels(p_replace=1, n_segments=(126, 144)))])
+            ])
 
 
         '''fence = np.zeros_like(images)
@@ -252,10 +250,10 @@ if __name__ == '__main__':
     #augment_labels = {"road": False, "buildings": False, "grass": False, "sky_n_zebra": False }
 
     #print augment_labels["road"]
-    augmenter_object = ImageAugmenter(augment_labels,2)
+    augmenter_object = ImageAugmenter(augment_labels,1)
     result = augmenter_object.augmenter_function(final_rgb_image,final_seg_image)  #augmentation based on segmentation labels
 
-    image = result[189]
+    image = result[167]
     cv2.imshow('image', image )
     cv2.waitKey(0)
     cv2.destroyAllWindows()
