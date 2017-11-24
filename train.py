@@ -10,6 +10,7 @@ from training_manager import TrainManager
 from output_manager import OutputManager
 
 import tensorflow as tf
+import numpy as np
 
 def restore_session(sess,saver,models_path):
 
@@ -111,7 +112,7 @@ def train(gpu_number, experiment_name):
 
   # # CREATE HERE THE TF SESSION
 
-
+  print_flag = True
     
   for i in range(initialIteration, config.number_iterations):
 
@@ -136,3 +137,11 @@ def train(gpu_number, experiment_name):
       
     #   """ With the current trained net, let the outputmanager print and save all the outputs """
     output_manager.print_outputs(i,duration) 
+
+    if print_flag == True:
+      #print entire batch(only once) to check if it is balanced
+      np.savetxt('batch_values.txt', output_manager._logger._last_batch_inputs, newline=' ',)
+      print_flag = False
+
+      #print(open('batch_values.txt', 'r').read().count(" 1.0")
+      #use something like this in terminal to check number of occurances of each

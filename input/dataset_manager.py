@@ -43,10 +43,7 @@ class DatasetManager(object):
 
 
 
-    if config.remove_noise:
-      divided_keys_train = spliter.divide_keys_by_labels(self._datasets_train[0][config.variable_names.index("Control")][:],config.labels_per_division,self._datasets_train[0][config.variable_names.index("Noise")][:]) # THE NOISE IS NOW NONE, TEST THIS
-    else:
-      divided_keys_train = spliter.divide_keys_by_labels(self._datasets_train[0][config.variable_names.index("Control")][:],config.labels_per_division,None)
+    divided_keys_train = spliter.divide_keys_by_labels(self._datasets_train[0][config.variable_names.index("Control")][:],config.labels_per_division,None)
 
     '''print '******'
     print len(divided_keys_train)   #prints 3, since in config, we set [2,2,2]
@@ -58,13 +55,7 @@ class DatasetManager(object):
     #print len(self._splited_keys_train)   #prints 3
 
 
-
-
-    if config.remove_noise:
-      divided_keys_val = spliter.divide_keys_by_labels(self._datasets_val[0][config.valriable_names.index("Control")][:],config.labels_per_division,self._datasets_val[0][config.variable_names.index("Noise")][:]) # THE NOISE IS NOW NONE, TEST THIS
-    else:
-      divided_keys_val = spliter.divide_keys_by_labels(self._datasets_val[0][config.variable_names.index("Control")][:],config.labels_per_division,None) # THE NOISE IS NOW NONE, TEST THIS
-
+    divided_keys_val = spliter.divide_keys_by_labels(self._datasets_val[0][config.variable_names.index("Control")][:],config.labels_per_division,None) # THE NOISE IS NOW NONE, TEST THIS
 
     self._splited_keys_val = spliter.split_by_output( self._datasets_val[0][config.variable_names.index("Steer")][:],divided_keys_val)
     #print len(self._splited_keys_val)      #prints 3

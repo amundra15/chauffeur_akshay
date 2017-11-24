@@ -54,9 +54,9 @@ if __name__ == "__main__":
   steering_pred =[]
   steering_gt =[]
 
-  positions_to_test = range(7) #total hdf5 files
+  positions_to_test = range(10) #total hdf5 files
 
-  path = '../VirtualElektraData3/SeqVal/'
+  path = '../Desktop/Carla_Machine_24_1/'
 
 
   screen = ScreenManager()
@@ -69,13 +69,8 @@ if __name__ == "__main__":
 
   actions_queue = deque()
 
-  '''#for 3 augmented images
-  screen.start_screen([200,88],3,4)'''
   screen.start_screen([200,88],1,2) 
 
-  '''#for 3 augmented images
-  images= [np.array([200,88,3]),np.array([200,88,3]),np.array([200,88,3])]
-  actions = [Control(),Control(),Control()]'''
 
   images= np.array([200,88,3])
   actions = Control()
@@ -83,18 +78,18 @@ if __name__ == "__main__":
 
   for h_num in positions_to_test:
 
+
+
     print " SEQUENCE NUMBER ",h_num
+
+    '''if h_num == 50:
+      continue'''
+
     data = h5py.File(path+'data_'+ str(h_num).zfill(5) +'.h5', "r")
 
-    #redata = h5py.File('/media/adas/012B4138528FF294/NewGTA/redata_'+ str(h_num).zfill(5) +'.h5', "r")
-    #print log.keys()
-    
 
     # skip to highway
-    for i in range(0,200,8):   #every hdf5 files containg data for 200 images
-
-
-      #img = cam['X'][log['cam1_ptr'][i]].swapaxes(0,2).swapaxes(0,1)
+    for i in range(0,200,5):   #every hdf5 files containg data for 200 images
 
 
       images =  np.array(data['rgb'][i]).astype(np.uint8)
@@ -105,9 +100,10 @@ if __name__ == "__main__":
       noisy_steer = data['targets'][i][5] 
       speed = data['targets'][i][10]
       continous_steer = actions.steer
+      human_intervention = data['targets'][i][27]
 
  
-      time_use =  1.0
+      '''time_use =  1.0
       car_lenght = 6.0
       extra_factor = 4.0
       threshold = 0.3
@@ -123,30 +119,22 @@ if __name__ == "__main__":
       elif actions.steer < -threshold:
         actions.steer = -1
       else:
-        actions.steer  =0
+        actions.steer  =0'''
 
 
       #plot on screen
-      screen.plot3camrc(0,images,actions,speed,[0,0],0,continous_steer) 
-
-      #print '***in view_carla_data****'
+      screen.plot3camrc(0,images,actions,speed,[0,0],0,continous_steer, human_intervention) 
 
       
-      time.sleep(0.15) #to slow video down
+      time.sleep(0.1) #to slow video down
+
 
       steer_list.append((actions.steer))
       noisy_steer_list.append((noisy_steer))
       #speed_list.append(speed)
 
-      #reimg = np.array(redata['images_center'][i])
-      #recontrol_input = np.array(redata['control'][i][1])
-      #print img
-      #img = img*255
-      #print img
 
-  plt.plot(range(0,len(steer_list)),steer_list,'r')
   plt.plot(range(0,len(noisy_steer_list)),noisy_steer_list)
+  plt.plot(range(0,len(steer_list)),steer_list,'r')
   
   plt.show()
-  #save_gta_surface(gta_surface)
-

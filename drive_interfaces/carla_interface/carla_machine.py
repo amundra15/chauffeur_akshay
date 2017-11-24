@@ -2,6 +2,8 @@
 import sys
 import os
 
+import pygame
+
 import socket
 import scipy
 import re
@@ -126,93 +128,30 @@ class CarlaMachine(Runnable,Driver):
 
     self.carla.newEpisode(0,0)
 
- 
-  '''def _get_direction_buttons(self):
-    #with suppress_stdout():if keys[K_LEFT]:
-    keys=pygame.key.get_pressed()
-
-    if( keys[K_s]):
-
-      self._left_button = False   
-      self._right_button = False
-      self._straight_button = False
-
-    if( keys[K_a]):
-      
-      self._left_button = True    
-      self._right_button = False
-      self._straight_button = False
 
 
-    if( keys[K_d]):
-      self._right_button = True
-      self._left_button = False
-      self._straight_button = False
+    joystick_count = pygame.joystick.get_count()
+    print 'joystick count: ',joystick_count
+    if joystick_count >1:
+      print "Please Connect Just One Joystick"
+      raise 
 
-    if( keys[K_w]):
+    #print joystick_count
 
-      self._straight_button = True
-      self._left_button = False
-      self._right_button = False
+    self.joystick = pygame.joystick.Joystick(0)
+    self.joystick.init()
 
-        
-    return [self._left_button,self._right_button,self._straight_button]'''
+
 
   def compute_direction(self,pos,ori,goal_pos,goal_ori):  # This should have maybe some global position... GPS stuff
     return 2    #always return 2 cos splitting on the basis of direction as well. and this will basically overcome that.
  
 
+
   def get_recording(self):
     return True
 
 
-  '''def run_step(self,data,target):
-
-    rewards = data[0]
-    sensor = data[2][0] #takes the first image
-    speed = rewards.speed
-
-    direction = self.compute_direction((rewards.player_x,rewards.player_y,22),(rewards.ori_x,rewards.ori_y,rewards.ori_z),(target[0],target[1],22),(1.0,0.02,-0.001))
-    #will return 2
-
-    #update score based on current position, inclination
-    current_score = tester.evaluate(rewards.)
-    self.score = self.score + current_score
-
-    """ Get Steering """
-
-    capture_time = time.time()
-
-    #resizing the 400,300 image to 200,100
-    sensor = sensor[65:265,:,:]
-    sensor = scipy.misc.imresize(sensor,[self._config.network_input_size[0],self._config.network_input_size[1]])
-
-    image_input = sensor.astype(np.float32)
-
-    #print future_image
-
-    #image_input = image_input - self._mean_image
-    #print "2"
-    image_input = np.multiply(image_input, 1.0 / 255.0)
-
-
-    #steer,acc,brake = machine_output_functions.single_branch(image_input,speed,direction,self._config,self._sess,self._train_manager)
-    steer,acc,brake = machine_output_functions.single_branch(image_input,self._config,self._sess,self._train_manager)
-
-
-    if brake < 0.1:
-      brake =0.0
-      
-    control = Control()
-    control.steer = steer
-    control.gas =acc
-    control.brake =brake
-
-    control.hand_brake = 0
-    control.reverse = 0
-
-
-    return control'''
 
   def compute_action(self,speed,rewards,sensor):
     self._old_speed = speed
@@ -230,10 +169,7 @@ class CarlaMachine(Runnable,Driver):
 
     image_input = sensor.astype(np.float32)
 
-    #print future_image
-
     #image_input = image_input - self._mean_image
-    #print "2"
     image_input = np.multiply(image_input, 1.0 / 127.0)
 
 
@@ -256,7 +192,7 @@ class CarlaMachine(Runnable,Driver):
     control.reverse = 0
 
 
-    if self._augment_left_right: # If augment data, we generate copies of steering for left and right
+    '''if self._augment_left_right: # If augment data, we generate copies of steering for left and right
       control_left = copy.deepcopy(control)
       print 'Left'
       control_left.steer = self._adjust_steering(control_left.steer,30.0,_new_speed) # The angles are inverse.
@@ -265,14 +201,21 @@ class CarlaMachine(Runnable,Driver):
       control_right.steer = self._adjust_steering(control_right.steer,-30.0,_new_speed)
    
       return [control_left,control,control_right], _new_speed
-
     else:
-      return control, _new_speed
+      return control, _new_speed'''
+
+    human_intervention = False
+    #if human wants to intervene, the corresponding steerings get priority
+    if self.joystick.get_button( 6 ):  #left
+      control.steer = -1
+      human_intervention = True
+    elif self.joystick.get_button( 7 ): #right
+      control.steer = 1
+      human_intervention = True
+
+    return control, _new_speed, human_intervention
 
   
-  # The augmentation should be dependent on speed
-
-
 
   def get_sensor_data(self):
     message = self.carla.getReward()
@@ -284,7 +227,7 @@ class CarlaMachine(Runnable,Driver):
     return data,images
 
 
-  def compute_perception_activations(self,sensor,speed):
+  '''def compute_perception_activations(self,sensor,speed):
 
     sensor = sensor[65:265,:,:]
 
@@ -305,7 +248,7 @@ class CarlaMachine(Runnable,Driver):
     #vbp_image = min_max_scaler.fit_transform(np.squeeze(vbp_image))
 
     print vbp_image.shape
-    return 0.5*grayscale_colormap(np.squeeze(vbp_image),'jet') + 0.5*image_input
+    return 0.5*grayscale_colormap(np.squeeze(vbp_image),'jet') + 0.5*image_input'''
   
   def act(self,action):
 

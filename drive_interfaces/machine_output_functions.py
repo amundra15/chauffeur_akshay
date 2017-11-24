@@ -124,7 +124,13 @@ def single_branch(image_input,config,sess,train_manager):
     predicted_steers[i] = int(round(predicted_steers[i]))'''
 
   predicted_steers = output_all[0][0][0]
-  discrete_steers = int(round(predicted_steers))
+  #discrete_steers = int(round(predicted_steers))
+  if predicted_steers > 0.3:
+    discrete_steers = 1
+  elif predicted_steers < -0.3:
+    discrete_steers = -1
+  else:
+    discrete_steers = 0
   predicted_speed = 7   #(output_all[0][0][1])
   
 

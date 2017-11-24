@@ -34,7 +34,7 @@ class Recorder(object):
 		self._image_size2 =image_size2
 		self._image_size1 = image_size1
 		self._record_image = record_image
-		self._number_rewards = 24
+		self._number_rewards = 28
 
 		self._image_cut = [65,265]
 
@@ -79,9 +79,9 @@ class Recorder(object):
 		return hf
 
 	#folder num to store images from diff cameras in different folders
-	def record(self,images,rewards,action,action_noise):	
+	def record(self,images,rewards,action,action_noise,human_intervention):	
 
-		self._data_queue.put([images,rewards,action,action_noise])
+		self._data_queue.put([images,rewards,action,action_noise,human_intervention])
 
 
 	@threaded
@@ -110,6 +110,7 @@ class Recorder(object):
 		rewards = data[1]
 		action = data[2]
 		action_noise = data[3]
+		human_intervention = data[4]
 		#folder_num = data[4]
 
 		pos = self._current_pos_on_file
@@ -160,6 +161,7 @@ class Recorder(object):
 		self.data_rewards[pos,21]  = rewards.ori_x
 		self.data_rewards[pos,22]  = rewards.ori_y
 		self.data_rewards[pos,23]  = rewards.ori_z
+		self.data_rewards[pos,27]  = human_intervention		#3 positions left in between to keep compatible with felipe's recorder
 		#self.data_rewards[pos,24]  = rewards.direction
 		#self.data_rewards[pos,25]  = rewards.noise
 		#self.data_rewards[pos,26]  = folder_num

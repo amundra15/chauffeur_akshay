@@ -104,13 +104,13 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 
 
 
-			action, new_speed = driver.compute_action(old_speed,rewards,image)	#passing rewards so that finally carla speed = computed speed
+			action, new_speed, human_intervention = driver.compute_action(old_speed,rewards,image)	#passing rewards so that finally carla speed = computed speed
 			#depending on driver being human or machine, new_speed can be the one given by driver or the network resp.
 
 			action_noisy,drifting_time,will_drift = noiser.compute_noise(action)
 			
 			if recording:
-				recorder.record(image,rewards,action,action_noisy)
+				recorder.record(image,rewards,action,action_noisy,human_intervention)
 
 
 
@@ -119,7 +119,7 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 					#print len(image)
 					screen_manager.plot_driving_interface(capture_time,np.copy(image),\
 						action,action_noisy,recording and (drifting_time == 0.0 or  will_drift),\
-						drifting_time,will_drift,rewards.speed,new_speed,0,0,0,type_of_driver, driver.continous_steer) #
+						drifting_time,will_drift,rewards.speed,new_speed,0,0,0,type_of_driver, driver.continous_steer, human_intervention) #
 
 				else:
 					dist_to_goal = math.sqrt(( rewards.goal[0]- rewards.position[0]) *(rewards.goal[0] - rewards.position[0]) + (rewards.goal[1] - rewards.position[1]) *(rewards.goal[1] - rewards.position[1]))

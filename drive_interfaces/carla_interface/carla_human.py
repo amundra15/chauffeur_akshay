@@ -172,7 +172,7 @@ class CarlaHuman(Driver):
 
 
 		else:
-			return control, self._new_speed
+			return control, self._new_speed, True	#human intervention doesnt makes sense for carla_human but still
 
 
 

@@ -139,7 +139,7 @@ class  ScreenManager(object):
 		pygame.display.flip()
 
 
-	def plot3camrc(self,capture_time,sensor_data,action,speed,orientation,screen_number=0,continous_steer=0):
+	def plot3camrc(self,capture_time,sensor_data,action,speed,orientation,screen_number=0,continous_steer=0, human_intervention=False):
 
 		start_to_print = time.time()
 		steer = action.steer
@@ -164,6 +164,9 @@ class  ScreenManager(object):
 
 		self.paint_on_screen(size_x/20,"Cont. steer value: %.2f" % continous_steer,(0,255,0),(size_x/2,15),screen_number)
 
+		if human_intervention == True:
+			self.paint_on_screen(size_x/8,"Human Intervention",(255,0,0),(size_x/2+5 ,50),screen_number)
+
 
 		pygame.display.flip()
 
@@ -173,7 +176,7 @@ class  ScreenManager(object):
 	#speed is giver by carla, calc_speed is given by driver/network
 	def plot_driving_interface(self,capture_time,sensor_data,\
 		action,action_noisy, recording,drifting_time,will_drift,speed,calc_speed,posx,\
-		posy,screen_number=0, type_of_driver = "Machine", continous_steer = 0):
+		posy,screen_number=0, type_of_driver = "Machine", continous_steer = 0, human_intervention = False):
 
 		start_to_print = time.time()
 		steer = action.steer
@@ -229,13 +232,17 @@ class  ScreenManager(object):
 
 		#### NETWORK SPEED PRINTED ON SCREEN HERE ####
 		if type_of_driver == "Machine":
+			self.paint_on_screen(size_x/25,"Driver: Machine" ,(255,0,0),(5,0),screen_number)
 			self.paint_on_screen(size_x/20,"speed from network: %.2f" % calc_speed,(0,255,0),(size_x/2 -30,30),screen_number)
 		if type_of_driver == "Human":
+			self.paint_on_screen(size_x/25,"Driver: Human" ,(255,0,0),(5,0),screen_number)
 			self.paint_on_screen(size_x/20,"speed from human driver: %.2f" % calc_speed,(0,255,0),(size_x/2 -30,30),screen_number)
 
 		#### CARLA SPEED PRINTED ON SCREEN HERE ####
 		self.paint_on_screen(size_x/20,"Carla speed: %.2f" % speed,(0,255,0),(size_x/2 -30,60),screen_number)
 
+		if human_intervention == True:
+			self.paint_on_screen(size_x/15,"Human Intervention",(255,0,0),(size_x/2 -30,120),screen_number)
 
 
 		pygame.display.flip()
