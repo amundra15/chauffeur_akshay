@@ -33,7 +33,7 @@ camera_port = 1   # Change this to your webcam ID, or file name for your video f
 ramp_frames = 30  #Number of frames to throw away while the camera adjusts to light levels
 
 UDP_IP = "10.42.0.144"
-UDP_PORT = 5007
+UDP_PORT = 5009
 sock = socket.socket(socket.AF_INET, # Internet
           socket.SOCK_DGRAM) # UDP
 
@@ -78,18 +78,20 @@ class ElektraMachine(Driver):
 
   # Initializes
 
-  def __init__(self,gpu_number,experiment_name,drive_conf,memory_fraction=0.95):
+  def __init__(self,gpu_number,experiment_name,drive_conf,input_method,memory_fraction=0.95):
 
     Driver.__init__(self)
     self._augment_left_right = drive_conf.augment_left_right
  
     self._augmentation_camera_angles = drive_conf.camera_angle 
 
+    self._input_method = input_method
     self._recording= False    
     self._rear = False
     self.steering_direction = 0
     self._new_speed = 0
-    self.resume = True #car always keep running
+    self.hold = True
+    self.resume = False
 
 
     self._resolution = drive_conf.resolution
@@ -206,7 +208,7 @@ class ElektraMachine(Driver):
       steer = 0
 
     control = Control()
-    control.speed = _new_speed
+    control.speed = 7
     control.steer = steer
 
 
@@ -228,6 +230,19 @@ class ElektraMachine(Driver):
         control.steer = 1
         human_intervention = True
 
+      if keys[pygame.K_s]:   #decrease speed to zero
+        self.hold = True
+        self.resume = False
+        print "hold"
+        self._new_speed = 0
+      #keys = pygame.key.get_pressed()
+      if keys[pygame.K_w]:   #increase speed to max
+        self.resume = True
+        self.hold = False
+        print "resume"
+        self._new_speed = 7
+
+    
 
     return control, _new_speed, human_intervention
 
@@ -269,43 +284,45 @@ class ElektraMachine(Driver):
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
 
-    #sending on/off to pi
-    '''if self.hold == True:
-        MESSAGE = 'h';  #hold
-        print MESSAGE               
-        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    else:'''
-    if self.resume == True:
-        MESSAGE = 'r';  #resume
-        print MESSAGE               
-        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-        self.resume = False #just send the signal once. it will keep running
+
+    #sending speed to pi
+    if(self._input_method == 'xbox'):
+      #sending speed from 0 to 7, when controlling with xbox
+      if(self._change != 0):   #send signal only when there is change in speed. if you send continously, turning wheels doesnt work!
+        if(self._change<0):
+          print "Control for decrease"
+          for k in range(int(abs(self._change)/0.7)):    
+            MESSAGE = '<'
+            print MESSAGE
+            sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
+          MESSAGE = 'w'
+          print MESSAGE
+          sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))          
+  
+        else: 
+          print "Control for increase"    
+          for k in range(int(abs(self._change)/0.7)):    
+            MESSAGE = '>'
+            print MESSAGE
+            sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
+          MESSAGE = 'w'
+          print MESSAGE
+          sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
 
-    
-    #sending the speed
-    #you may have to define self._new_speed and self._old_speed in class definition
-    '''change= int((self._new_speed-self._old_speed)/0.7)
-  
-    if(change<0):
-      print "Control for decrease"
-      for k in range(abs(change)):    
-        MESSAGE = '<'
-        print MESSAGE
-        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
-      MESSAGE = 'w'
-      print MESSAGE
-      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))          
-  
-    else: 
-      print "Control for increase"    
-      for k in range(abs(change)):    
-        MESSAGE = '>'
-        print MESSAGE
-        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))  
-      MESSAGE = 'w'
-      print MESSAGE
-      sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))'''
+    else:
+      #sending on/off when controlling by keyboard
+      if self.hold == True:
+        MESSAGE = 'h';	#hold
+        print MESSAGE								
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+        self.hold = False #cos we want to send the signal
+      
+      if self.resume == True:
+        MESSAGE = 'r';	#resume
+        print MESSAGE								
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+        self.resume = False #cos we want to send the signal
 
 
 

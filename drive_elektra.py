@@ -53,11 +53,11 @@ def get_instance(drive_config,experiment_name,drivers_name,memory_use,input_meth
 		driver = ElektraHuman(drive_config,input_method)
 	else:
 		from elektra_machine import ElektraMachine
-		driver = ElektraMachine("0",experiment_name,drive_config,memory_use)
+		driver = ElektraMachine("0",experiment_name,drive_config,input_method,memory_use)
 
 
 	if drivers_name is not None:
-		folder_name = 'Elektra_' + type_of_driver + '_' + experiment_name + '_' + str(datetime.datetime.today().day) 	#+'_'+drivers_name
+		folder_name = str(datetime.datetime.today().day) + '_Elektra_' + drive_config.type_of_driver + '_' + experiment_name
 		folder_name += '_' + str(get_latest_file_number(drive_config.path,folder_name))
 		recorder = Recorder(drive_config.path + folder_name +'/',88,200,image_cut= drive_config.image_cut)
 	else:
