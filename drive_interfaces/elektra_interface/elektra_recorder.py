@@ -40,8 +40,8 @@ class Recorder(object):
 		self._record_image = record_image
 
 
-		# TODO SET THE NUMBER OF REWARDS + ACTIONS
-		self._number_rewards = 15
+
+		self._number_rewards = 28
 		self._num_cams = 1
 
 		if not os.path.exists(self._file_prefix):
@@ -77,11 +77,11 @@ class Recorder(object):
 		return hf
 
 	# TODO: Add some timestamp
-	def record(self,images,speed,steer,steer_noise):
+	def record(self,images,speed,steer,steer_noise,human_intervention):
 	#def record(self,images,action,action_noise):
 
 
-		self._data_queue.put([images,speed,steer,steer_noise])
+		self._data_queue.put([images,speed,steer,steer_noise,human_intervention])
 		#self._data_queue.put([images,action,action_noise])
 
 	@threaded
@@ -99,6 +99,7 @@ class Recorder(object):
 		speed = data[1]
 		steer = data[2]
 		steer_noise = data[3]
+		human_intervention = data[4]
 
 		for i in range(self._num_cams):
 			if self._current_pos_on_file == self._number_images_per_file:
@@ -128,12 +129,12 @@ class Recorder(object):
 				image = scipy.misc.imresize(image,[self._image_size2,self._image_size1])
 				self.data_center[pos] = image
 			#print actions[i].steer 
-			self.data_rewards[pos,0]  = steer
 
+
+			self.data_rewards[pos,0]  = steer
 			self.data_rewards[pos,5]  = steer_noise
 			self.data_rewards[pos,10]  = speed  
-       
-       
+			self.data_rewards[pos,27]  = human_intervention	
 
 		
 			#print "GAS - >", self.data_rewards[pos,1]

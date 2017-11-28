@@ -360,11 +360,10 @@ class Dataset(object):
 
 
 
-            #check this augmentation using view_carla_data.py before using it
           #used for steering augmentation(when multiple cameras used) in discrete domain
-          '''if hasattr(self._config, 'augment_and_saturate_factor') and self._config.targets_names[j] == "Steer":
+          if hasattr(self._config, 'augment_and_saturate_factor') and self._config.targets_names[j] == "Steer":
             camera_angle = float_data[self._config.variable_names.index('Angle'),i]
-            steer = float_data['targets'][i][0]
+            steer = float_data[self._config.variable_names.index('Steer'),i]
             speed = float_data[self._config.variable_names.index('Speed'),i]
 
             time_use =  1.0
@@ -384,7 +383,7 @@ class Dataset(object):
             elif steer < -threshold:
               targets[count][i] = -1
             else:
-              targets[count][i]  =0'''
+              targets[count][i]  =0
 
 
           count += 1

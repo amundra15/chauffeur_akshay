@@ -54,9 +54,9 @@ if __name__ == "__main__":
   steering_pred =[]
   steering_gt =[]
 
-  positions_to_test = range(10) #total hdf5 files
+  positions_to_test = range(1,61) #total hdf5 files
 
-  path = '../Desktop/Carla_Machine_24_1/'
+  path = '../Desktop/27_Carla_Human__8/'
 
 
   screen = ScreenManager()
@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
 
     # skip to highway
-    for i in range(0,200,5):   #every hdf5 files containg data for 200 images
+    for i in range(0,200,25):   #every hdf5 files containg data for 200 images
 
 
       images =  np.array(data['rgb'][i]).astype(np.uint8)
@@ -102,8 +102,9 @@ if __name__ == "__main__":
       continous_steer = actions.steer
       human_intervention = data['targets'][i][27]
 
- 
-      '''time_use =  1.0
+
+      #augment images from multiple cameras 
+      time_use =  1.0
       car_lenght = 6.0
       extra_factor = 4.0
       threshold = 0.3
@@ -119,7 +120,8 @@ if __name__ == "__main__":
       elif actions.steer < -threshold:
         actions.steer = -1
       else:
-        actions.steer  =0'''
+        actions.steer  =0
+
 
 
       #plot on screen

@@ -4,6 +4,7 @@ import cv2
 
 import scipy
 
+import pygame
 
 import math
 import copy
@@ -133,6 +134,29 @@ class ElektraMachine(Driver):
       #print retval   
 
 
+    # Start the interface with the joystick (if using)
+    if(self._input_method == 'xbox'):
+      #pygame.joystick.init()
+      joystick_count = pygame.joystick.get_count()
+      if joystick_count >1:
+        print "Please Connect Just One Joystick"
+        raise 
+      print "joystick count: ", joystick_count
+      self.joystick = pygame.joystick.Joystick(0)
+      self.joystick.init()
+      print 'USE XBOX JOYSTICK...'
+      #print self.joystick.get_numbuttons()
+    
+
+    #otherwise initialize pygame for keyboard 
+    else:
+      pygame.init()
+      #clock = pygame.time.Clock()
+      screen = pygame.display.set_mode((100,100))
+      event=pygame.event.poll()
+      print 'USE KEYBOARD...'
+
+    
 
   def get_recording(self):
     return True
@@ -172,26 +196,40 @@ class ElektraMachine(Driver):
 
     #steer,acc,brake = self._control_function(image_input,speed,direction,self._config,self._sess,self._train_manager)
     steer,_new_speed = machine_output_functions.single_branch_steer_only(image_input,self._config,self._sess,self._train_manager)
-
     #note: we are not training for speed as of now. so network just returns speed value as 7 always
+
+    if steer > 0.35:
+      steer = 1
+    elif steer < -0.35:
+      steer = -1
+    else:
+      steer = 0
 
     control = Control()
     control.speed = _new_speed
     control.steer = steer
 
-    if self._augment_left_right: # If augment data, we generate copies of steering for left and right
-      control_left = copy.deepcopy(control)
 
-      control_left.steer = self._adjust_steering(control_left.steer,self._augmentation_camera_angles,speed) # The angles are inverse.
-      control_right = copy.deepcopy(control)
-
-      control_right.steer = self._adjust_steering(control_right.steer,-self._augmentation_camera_angles,speed)
-
-      return [control,control,control]
-
+    human_intervention = False
+    #if human wants to intervene, the corresponding steerings get priority
+    if(self._input_method == 'xbox'):
+      if self.joystick.get_button( 6 ):  #left
+        control.steer = -1
+        human_intervention = True
+      elif self.joystick.get_button( 7 ): #right
+        control.steer = 1
+        human_intervention = True
     else:
+      keys = pygame.key.get_pressed()
+      if keys[pygame.K_a]:
+        control.steer = -1
+        human_intervention = True
+      elif keys[pygame.K_d]:
+        control.steer = 1
+        human_intervention = True
 
-      return control, _new_speed
+
+    return control, _new_speed, human_intervention
 
 
   def get_sensor_data(self):

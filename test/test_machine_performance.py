@@ -81,7 +81,7 @@ class PerformanceTester(object):
 
 		if location_matched == True:
 			#checking for inclination
-			if (norm(map(float.__sub__, self.checkpoints[i][1], inclination))) < 100:
+			if (norm(map(float.__sub__, abs(self.checkpoints[i][1]), abs(inclination)))) < 100:
 				print "CHECKPOINT CLEARED.  Co-ordinates:", self.checkpoints[i][0]
 				self.matched_checkpoints.append(self.checkpoints[i])
 				del self.checkpoints[i]		#if entirely matched,delete that item from list

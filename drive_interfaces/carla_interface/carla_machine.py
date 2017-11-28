@@ -108,7 +108,11 @@ class CarlaMachine(Runnable,Driver):
     cpkt = restore_session(self._sess,saver,self._config.models_path)
 
     self.tester = PerformanceTester()
-    self.score = 0
+    self.checkpoint_score = 0
+
+    self.machine_driving_count = 0
+    self.human_driving_count = 0
+
 
 
 
@@ -176,11 +180,6 @@ class CarlaMachine(Runnable,Driver):
     self.continous_steer, discrete_steer, _new_speed = machine_output_functions.single_branch(image_input,self._config,self._sess,self._train_manager)
 
 
-    #update score based on current position, inclination
-    current_score = self.tester.evaluate([rewards.player_x, rewards.player_y],[rewards.ori_x,rewards.ori_y,rewards.ori_z])
-    self.score = self.score + current_score
-
-
     control = Control()
     control.steer = discrete_steer
     if(_new_speed - rewards.speed) > 0.05:
@@ -192,26 +191,28 @@ class CarlaMachine(Runnable,Driver):
     control.reverse = 0
 
 
-    '''if self._augment_left_right: # If augment data, we generate copies of steering for left and right
-      control_left = copy.deepcopy(control)
-      print 'Left'
-      control_left.steer = self._adjust_steering(control_left.steer,30.0,_new_speed) # The angles are inverse.
-      control_right = copy.deepcopy(control)
-      print 'right'
-      control_right.steer = self._adjust_steering(control_right.steer,-30.0,_new_speed)
-   
-      return [control_left,control,control_right], _new_speed
-    else:
-      return control, _new_speed'''
 
     human_intervention = False
     #if human wants to intervene, the corresponding steerings get priority
     if self.joystick.get_button( 6 ):  #left
+      #print "left"
       control.steer = -1
       human_intervention = True
+      self.human_driving_count = self.human_driving_count +1
     elif self.joystick.get_button( 7 ): #right
+      #print "right"
       control.steer = 1
       human_intervention = True
+      self.human_driving_count = self.human_driving_count +1
+    else:
+      self.machine_driving_count = self.machine_driving_count +1
+
+    #update score based on current position, inclination (only when human is not intervening)
+    if human_intervention == False:
+      current_score = self.tester.evaluate([measurements['PlayerMeasurements'].transform.location.x, measurements['PlayerMeasurements'].transform.location.y],[measurements['PlayerMeasurements'].transform.orientation.x,measurements['PlayerMeasurements'].transform.orientation.y,measurements['PlayerMeasurements'].transform.orientation.z])
+      self.checkpoint_score = self.checkpoint_score + current_score
+
+
 
     return control, _new_speed, human_intervention
 
@@ -227,28 +228,6 @@ class CarlaMachine(Runnable,Driver):
     return data,images
 
 
-  '''def compute_perception_activations(self,sensor,speed):
-
-    sensor = sensor[65:265,:,:]
-
-    sensor = scipy.misc.imresize(sensor,[self._config.network_input_size[0],self._config.network_input_size[1]])
-
-    image_input = sensor.astype(np.float32)
-
-    #print future_image
-
-    #image_input = image_input - self._mean_image
-    #print "2"
-    image_input = np.multiply(image_input, 1.0 / 127.0)
-
-
-    vbp_image =  machine_output_functions.vbp(image_input,speed,self._config,self._sess,self._train_manager)
-
-    #min_max_scaler = preprocessing.MinMaxScaler()
-    #vbp_image = min_max_scaler.fit_transform(np.squeeze(vbp_image))
-
-    print vbp_image.shape
-    return 0.5*grayscale_colormap(np.squeeze(vbp_image),'jet') + 0.5*image_input'''
   
   def act(self,action):
 

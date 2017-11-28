@@ -225,7 +225,7 @@ class ElektraHuman(Driver):
     control.speed = self._new_speed
     control.steer = self.steering_direction
 
-    return control, self._new_speed
+    return control, self._new_speed, True #human intervention doesnt makes sense for carla_human but still
 
 
 

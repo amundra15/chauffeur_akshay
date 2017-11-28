@@ -1,6 +1,7 @@
-#this file trains for data from virtual world elektra data by human;steer only, implementing f01_ecf45_testsevencamera.py
-#single cam, therefore augment_and_saturate_factor = False
-#implements label wise augmentation
+#this file trains for data from virtual world elektra data by agent;steer only, implementing fak17_cf45_steer.py
+#also does augmentation for seven cameras
+#this exp does augmentation , label wise as well
+#it has data for forward and backward laps
 import random
 
 import imgaug as ia
@@ -101,7 +102,7 @@ class configInput(configMain):
 	        oc(iaa.Dropout((0.0, 0.10), per_channel=0.5)), # randomly remove up to X% of the pixels
 	        oc(iaa.CoarseDropout((0.0, 0.10), size_percent=(0.08, 0.2),per_channel=0.5)), # randomly remove up to X% of the pixels
 	        oc(iaa.Add((-40, 40), per_channel=0.5)), # change brightness of images (by -X to Y of original value)
-	        st(iaa.Multiply((0.10, 2), per_channel=0.2)), # change brightness of images (X-Y% of original value)
+	        st(iaa.Multiply((0.10, 2.5), per_channel=0.2)), # change brightness of images (X-Y% of original value)
 	        rl(iaa.ContrastNormalization((0.5, 1.5), per_channel=0.5)), # improve or worsen the contrast
 	        rl(iaa.Grayscale((0.0, 1))), # put grayscale
 
@@ -110,7 +111,7 @@ class configInput(configMain):
 		    random_order=True # do all of the above in random order
 		)
 		self.augment_labels = True
-		self.augment_amount = 1   #3=max, 2=mid, 1=min
+		self.augment_amount = 3   #3=max, 2=mid, 1=min
 		self.labels_to_augment = {"road": True, "buildings": True, "grass": True, "sky_n_zebra": True }
 
 
@@ -124,7 +125,7 @@ class configInput(configMain):
 		#	path = f.read().strip()
 
 			
-		path = '../VirtualElektraData3'
+		path = '../VirtualElektraData2_Double'
 
 
 		train_path = os.path.join(path, 'SeqTrain')
@@ -161,7 +162,7 @@ class configInput(configMain):
 		# TODO NOT IMPLEMENTED Felipe: True/False switches to turn data balancing on or off
 		self.balances_val = True
 		self.balances_train = True
-		#self.augment_and_saturate_factor = False
+		self.augment_and_saturate_factor = True
 
 
 
@@ -209,6 +210,10 @@ class configOutput(configMain):
 		self.selected_branch = 0  # for the branches that have steering we also select the branch
 		self.inputs_to_print = ['Steer']
 
+
+
+		""" Feature Visualization Part """
+		# TODO : self.histograms_list=[]	self.features_to_draw=  self.weights_to_draw=
 
 
 '''class configTest(configMain):

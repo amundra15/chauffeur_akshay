@@ -57,7 +57,7 @@ def get_instance(drive_config,experiment_name,drivers_name,memory_use,input_meth
 
 
 	if drivers_name is not None:
-		folder_name = 'Elektra_' + type_of_driver + '_' + str(datetime.datetime.today().day) 	#+'_'+drivers_name
+		folder_name = 'Elektra_' + type_of_driver + '_' + experiment_name + '_' + str(datetime.datetime.today().day) 	#+'_'+drivers_name
 		folder_name += '_' + str(get_latest_file_number(drive_config.path,folder_name))
 		recorder = Recorder(drive_config.path + folder_name +'/',88,200,image_cut= drive_config.image_cut)
 	else:
@@ -103,7 +103,7 @@ def drive_elektra(experiment_name,drive_config,input_method,name = None,memory_u
 			recording = driver.get_recording()		#just booleans, received from joystick
 			driver.get_reset()			#just booleans, received from joystick
 
-			action,new_speed = driver.compute_action(images,old_speed) #rewards.speed
+			action,new_speed,human_intervention = driver.compute_action(images,old_speed) #rewards.speed
 
 
 			#action_noisy,drifting_time,will_drift = noiser.compute_noise(action[drive_config.middle_camera])
@@ -112,11 +112,11 @@ def drive_elektra(experiment_name,drive_config,input_method,name = None,memory_u
 
 			if recording:
 				print "RECORDING"
-				recorder.record(images,action.speed,action.steer,action_noisy.steer)
+				recorder.record(images,action.speed,action.steer,action_noisy.steer,human_intervention)
 
 
-			#####TODO: implement this for elektra
-			if drive_config.show_screen:
+
+			'''if drive_config.show_screen:
 				if drive_config.interface == "Carla":
 					for i in range(drive_config.number_screens-1):
 						screen_manager.plot_driving_interface( capture_time,np.copy(images[i]),\
@@ -125,7 +125,7 @@ def drive_elektra(experiment_name,drive_config,input_method,name = None,memory_u
 
 				else:
 					print "Not supported interface"
-					pass
+					pass'''
 
 			
 			'''if drive_config.type_of_driver == "Machine" and drive_config.show_screen and drive_config.plot_vbp:
