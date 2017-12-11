@@ -54,9 +54,9 @@ if __name__ == "__main__":
   steering_pred =[]
   steering_gt =[]
 
-  positions_to_test = range(1,61) #total hdf5 files
+  positions_to_test = range(7,15) #total hdf5 files
 
-  path = '../Desktop/27_Carla_Human__8/'
+  path = '../Desktop/VirtualElektraData2_W1/SeqTrain/'
 
 
   screen = ScreenManager()
@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
 
     # skip to highway
-    for i in range(0,200,25):   #every hdf5 files containg data for 200 images
+    for i in range(0,200):   #every hdf5 files containg data for 200 images
 
 
       images =  np.array(data['rgb'][i]).astype(np.uint8)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
       screen.plot3camrc(0,images,actions,speed,[0,0],0,continous_steer, human_intervention) 
 
       
-      time.sleep(0.1) #to slow video down
+      time.sleep(0.5) #to slow video down
 
 
       steer_list.append((actions.steer))

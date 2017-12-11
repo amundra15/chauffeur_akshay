@@ -180,7 +180,6 @@ class CarlaHuman(Driver):
 		message = self.carla.getReward()
 		data = message[0]
 		images = message[2][0]
-		print visual_data[1].shape
 
 		pos = [data.player_x,data.player_y,22 ]
 		ori = [data.ori_x,data.ori_y,data.ori_z ]

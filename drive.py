@@ -79,7 +79,7 @@ def drive(host,port,gpu_number,path,show_screen,resolution,noise_type,config_pat
 		screen_manager.start_screen(resolution,3,2)
 
 
-	folder_name = str(datetime.datetime.today().day) + '_' + 'Carla_' + drive_config.type_of_driver + '_' + experiment_name
+	folder_name = str(datetime.datetime.today().day) + '_' + 'Carla_' + type_of_driver + '_' + experiment_name
 	folder_name += '_' + str(get_latest_file_number(path,folder_name))
 	recorder = Recorder(path + folder_name +'/',88,200)
 	#Note: resolution size is 400,300. but we give input to network 200,100 by cropping it.

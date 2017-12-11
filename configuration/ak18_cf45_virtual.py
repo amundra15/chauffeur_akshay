@@ -124,7 +124,7 @@ class configInput(configMain):
 		#	path = f.read().strip()
 
 			
-		path = '../VirtualElektraData3'
+		path = '../VirtualElektraData4'
 
 
 		train_path = os.path.join(path, 'SeqTrain')

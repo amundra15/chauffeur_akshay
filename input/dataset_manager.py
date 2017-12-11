@@ -216,7 +216,7 @@ class DatasetManager(object):
 
 
 
-    #no longer needed
+  #no longer needed
   '''def compute_average_number(self,images,splited_keys,input_size):
     
 

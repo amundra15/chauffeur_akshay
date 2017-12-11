@@ -63,12 +63,6 @@ def load_system(config):
 
   training_manager.build_network()
 
-
-  """ Initializing Session as variables that control the session """
-  
-
-
-
   return training_manager
 
 
@@ -163,8 +157,6 @@ class ElektraMachine(Driver):
   def get_recording(self):
     return True
 
-
-
   def get_reset(self):
     return False
 
@@ -176,12 +168,7 @@ class ElektraMachine(Driver):
 
     self._old_speed = speed
 
-    """ Get Steering """
-    # receives from 1000 to 2000 
     direction = self.get_direction()
-
-    # Just taking the center image to send to the network
-
 
     sensor = sensor[self._image_cut[0]:self._image_cut[1],:,:]
 
@@ -189,10 +176,8 @@ class ElektraMachine(Driver):
 
     image_input = sensor.astype(np.float32)
 
-    #print future_image
-
     #image_input = image_input - self._mean_image
-    #print "2"
+
     image_input = np.multiply(image_input, 1.0 / 255.0)
 
 

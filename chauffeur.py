@@ -107,7 +107,7 @@ if __name__ == '__main__':
   parser.add_argument('--driver', default="Human", help='Select who is driving, a human or a machine')
   parser.add_argument('-ga','--game', default="Carla", help='The game being used as interface')
   parser.add_argument('-cy','--city', default="carla_0", help='select the graph from the city being used')
-  parser.add_argument('-im', '--input_method', default="keyboard", help = 'human controlling real car by keyboard or controller' )
+  parser.add_argument('-im', '--input_method', default="keyboard", help = 'human controlling real car by keyboard or controller' )  #or xbox
 
   args = parser.parse_args()
   print args

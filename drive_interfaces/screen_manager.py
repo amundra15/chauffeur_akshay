@@ -187,9 +187,9 @@ class  ScreenManager(object):
 		#a = sensor_data.shape
 		#print a
 		#print len(a)
-		o_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
-		sensor_data = sensor_data[0]
-		#size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
+		'''no_of_cameras,size_x,size_y,size_z = sensor_data.shape		#returns (1, 300, 400, 3)
+		sensor_data = sensor_data[0]'''
+		size_x,size_y,size_z = sensor_data.shape		#returns (300, 400, 3) #dont know why toggles between above and this suddenly!
 		#Note: Depending upon the above two, include or not line 242
 
 
@@ -241,7 +241,7 @@ class  ScreenManager(object):
 		#### CARLA SPEED PRINTED ON SCREEN HERE ####
 		self.paint_on_screen(size_x/20,"Carla speed: %.2f" % speed,(0,255,0),(size_x/2 -30,60),screen_number)
 
-		if human_intervention == True:
+		if human_intervention == True and type_of_driver == "Machine":
 			self.paint_on_screen(size_x/15,"Human Intervention",(255,0,0),(size_x/2 -30,120),screen_number)
 
 

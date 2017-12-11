@@ -154,7 +154,6 @@ def single_branch_steer_only(image_input,config,sess,train_manager):
   image_input = image_input.reshape((1,config.image_size[0],config.image_size[1],config.image_size[2]))
 
 
-
   feedDict = {x: image_input,dout: [1]*len(config.dropout) }
 
 
@@ -174,7 +173,7 @@ def single_branch_steer_only(image_input,config,sess,train_manager):
   return  predicted_steers,predicted_speed
 
 
-#taken from felipe's chauffeur
+#taken from felipe's chauffeur, same as single_branch_steer_only
 def base_no_speed(image_input,speed,control_input,config,sess,train_manager):
 
   
